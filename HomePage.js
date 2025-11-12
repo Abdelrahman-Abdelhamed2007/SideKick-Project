@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Shared DOM Elements ---
     const terminalOutput = document.getElementById('terminal-output');
-    const launchApp = document.getElementById('launch-app'); // ✅ NEW
-    const launchText = document.getElementById('launch-text'); // ✅ NEW
+    const launchApp = document.getElementById('launch-app');
+    const launchText = document.getElementById('launch-text');
     const appButtons = document.querySelectorAll('.app-btn');
     const appViews = document.querySelectorAll('.app-view');
     const monitor = document.querySelector('.monitor');
@@ -58,16 +58,28 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentTriviaAnswer = "";
     let permanentBootText = ""; // Stores the "SideKick... READY." text
 
-    // --- Audio Logic (Unchanged) ---
+    // ✅ NEW: Create a single AudioContext, initially 'null'
+    let audioCtx = null;
+
+    // --- Audio Logic (UPDATED) ---
+    // ✅ This function now manages the single audioCtx
     const createAudioContext = () => {
+        if (audioCtx) {
+            // If it exists but is suspended (common on page load)
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+        
+        // Create it for the first time
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (!AudioContext) return null;
-        const context = new AudioContext();
-        if (context.state === 'suspended') {
-            context.resume();
-        }
-        return context;
+        
+        audioCtx = new AudioContext();
+        return audioCtx;
     };
+
     const beep = () => {
         const context = createAudioContext();
         if (!context) return;
