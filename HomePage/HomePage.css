@@ -1,0 +1,457 @@
+:root {
+    --monitor-bg: #111;
+    --screen-bg: #000;
+    --screen-text: #00ff41; /* CRT green */
+    --dashboard-bg: #40404a;
+    --button-bg: #555560;
+    --button-hover-bg: #60606b;
+    --button-text: #eee;
+    --dark-text: #eee;
+    --light-text: #ccc;
+    --grid-placeholder: #333333;
+}
+
+/* Global Reset and Font */
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--monitor-bg);
+    font-family: 'Press Start 2P', 'Consolas', monospace;
+    color: var(--button-text);
+}
+
+.container {
+    width: 900px;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Monitor Section (Top Half) --- */
+.monitor {
+    background-color: var(--screen-bg);
+    border: 15px solid var(--monitor-bg);
+    border-radius: 5px 5px 0 0;
+    padding: 20px;
+    height: 450px;
+    overflow: hidden;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.monitor::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none;
+}
+
+.screen {
+    /* Critical for app view positioning */
+    position: relative; 
+    width: 100%;
+    height: 100%;
+
+    color: var(--screen-text);
+    font-size: 1.2rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    text-shadow: 0 0 5px rgba(0, 255, 65, 0.6);
+}
+
+/* --- Dashboard Section (Bottom Half) --- */
+.dashboard {
+    background-color: var(--dashboard-bg);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-radius: 0 0 5px 5px;
+    gap: 30px;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2);
+}
+
+.system-apps h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+    color: var(--light-text);
+    font-weight: normal;
+}
+
+.app-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    width: 320px;
+}
+
+.app-btn {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    line-height: 1.2;
+    text-transform: uppercase;
+    text-align: left;
+    transition: background-color 0.15s;
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.app-btn:hover {
+    background-color: var(--button-hover-bg);
+}
+
+.icon {
+    margin-right: 8px;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+/* --- GDG Logo Container --- */
+.logo-container {
+    flex-grow: 1; /* Allows it to take the available space */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10px; /* Aligns it vertically with other elements */
+}
+
+#gdg-logo {
+    width: 100%;
+    max-width: 180px; /* Adjust this size as you like */
+    height: auto;
+    
+    /* --- The Grayscale Effect --- */
+    filter: grayscale(100%);
+    
+    /* Soften the logo to match the dark theme */
+    opacity: 0.6;
+}
+
+/* Info Panel (Right Side) */
+.info-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    width: 200px;
+    padding-top: 15px;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--light-text);
+    margin-bottom: 5px;
+}
+
+.copyright {
+    font-size: 0.65rem;
+    color: var(--dark-text);
+    margin-bottom: 20px;
+}
+
+/* --- App View General Styles --- */
+.app-view {
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.app-action-btn {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: 1px solid var(--button-text);
+    padding: 8px 12px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    transition: background-color 0.1s;
+}
+
+.app-action-btn:hover:not(:disabled) {
+    background-color: var(--button-hover-bg);
+}
+
+.app-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.message-line {
+    color: var(--screen-text);
+    font-size: 0.7rem; 
+    text-align: center;
+    height: 1em; /* Reserve space */
+}
+
+/* --- 1. Timer Application Styles --- */
+.timer-top {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50%;
+}
+
+.timer-display {
+    font-size: 4rem;
+    color: var(--screen-text);
+    text-align: center;
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.8); 
+}
+
+.timer-controls-wrapper {
+    height: 50%; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.timer-controls input {
+    background: none;
+    border: 1px solid var(--screen-text);
+    color: var(--screen-text);
+    padding: 5px;
+    width: 60px;
+    text-align: center;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    box-shadow: 0 0 5px rgba(0, 255, 65, 0.4);
+}
+
+.timer-controls input::-webkit-outer-spin-button,
+.timer-controls input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* --- 2. TO-DO Application Styles --- */
+.todo-toolbar-wrapper {
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.todo-toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#todo-input {
+    background: none;
+    border: 1px solid var(--screen-text);
+    color: var(--screen-text);
+    padding: 6px;
+    width: 350px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    box-shadow: 0 0 5px rgba(0, 255, 65, 0.4);
+}
+
+.todo-list-container {
+    height: 50%;
+    overflow-y: auto;
+    padding: 0 10px;
+    box-sizing: border-box;
+    border: 1px solid #005500;
+}
+
+#todo-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.todo-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    color: var(--screen-text);
+    font-size: 0.7rem;
+    cursor: pointer;
+    border-bottom: 1px dotted rgba(0, 255, 65, 0.2);
+}
+
+.todo-item .task-text {
+    position: relative;
+    padding-left: 35px; 
+}
+
+.todo-item .task-text::before {
+    content: '[ ]';
+    position: absolute;
+    left: 0;
+}
+
+.todo-item.checked .task-text::before {
+    content: '[X]';
+}
+
+.todo-item.checked .task-text {
+    color: #008822; 
+    text-decoration: line-through;
+}
+
+.todo-list-container::-webkit-scrollbar { width: 10px; }
+.todo-list-container::-webkit-scrollbar-track { background: #000; border: 1px solid #005500; }
+.todo-list-container::-webkit-scrollbar-thumb { background-color: var(--screen-text); border-radius: 5px; border: 1px solid #000; }
+
+/* --- 3. Music Application Styles --- */
+.music-top {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50%;
+}
+
+#music-title {
+    font-size: 1rem;
+    text-align: center;
+    color: var(--screen-text);
+}
+
+.music-controls-wrapper {
+    height: 50%; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.music-progress-container {
+    width: 80%;
+    height: 10px;
+    background-color: #005500;
+    border: 1px solid var(--screen-text);
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+#music-progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: var(--screen-text);
+}
+
+.music-buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+#music-file-input {
+    display: none;
+}
+
+.file-input-label {
+    padding: 10px 15px;
+    font-size: 0.7rem;
+}
+
+/* --- 4. Trivia Application Styles --- */
+.trivia-question-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 60%;
+    text-align: center;
+}
+
+#trivia-category {
+    font-size: 0.7rem;
+    color: #008822;
+    margin-bottom: 10px;
+}
+
+#trivia-question {
+    font-size: 1rem;
+}
+
+.trivia-answer-wrapper {
+    height: 40%; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+#trivia-input {
+    background: none;
+    border: 1px solid var(--screen-text);
+    color: var(--screen-text);
+    padding: 6px;
+    width: 70%;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    box-shadow: 0 0 5px rgba(0, 255, 65, 0.4);
+    margin-bottom: 15px;
+}
+
+#trivia-submit-btn, #trivia-next-btn {
+    width: 70%;
+    margin-bottom: 10px;
+}
+
+/* --- 5. Launch Sequence Screen --- */
+#launch-app {
+    /* These center the "LAUNCHING..." text */
+    justify-content: center;
+    align-items: center;
+}
+
+#launch-text {
+    /* Match the font size and glow of the main terminal */
+    font-size: 1.2rem;
+    text-shadow: 0 0 5px rgba(0, 255, 65, 0.6);
+    white-space: pre-wrap; /* Ensures the cursor stays on the line */
+}

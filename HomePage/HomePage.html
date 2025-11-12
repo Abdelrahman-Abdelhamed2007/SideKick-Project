@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SideKick OS v1.0.1</title>
+    <link rel="stylesheet" href="HomePage.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="monitor">
+            <div class="screen">
+                <p id="terminal-output"></p>
+                <div id="launch-app" class="app-view hidden">
+                    <p id="launch-text"></p>
+                </div>
+
+                <div id="timer-app" class="app-view hidden">
+                    <div class="timer-top">
+                        <div class="timer-display">
+                            <span id="timer-hours">00</span>:<span id="timer-minutes">00</span>:<span
+                                id="timer-seconds">00</span>
+                        </div>
+                    </div>
+                    <div class="timer-controls-wrapper">
+                        <div class="timer-controls">
+                            <input type="number" id="input-hours" placeholder="HRS" min="0" max="99">
+                            <input type="number" id="input-minutes" placeholder="MIN" min="0" max="59">
+                            <input type="number" id="input-seconds" placeholder="SEC" min="0" max="59">
+                            <button id="start-pause-btn" class="app-action-btn">START</button>
+                            <button id="reset-timer-btn" class="app-action-btn">RESET</button>
+                        </div>
+                        <p id="timer-message" class="message-line"></p>
+                    </div>
+                </div>
+
+                <div id="todo-app" class="app-view hidden">
+                    <div class="todo-toolbar-wrapper">
+                        <div class="todo-toolbar">
+                            <input type="text" id="todo-input" placeholder="ENTER NEW TASK" maxlength="100">
+                            <button id="add-todo-btn" class="app-action-btn">ADD</button>
+                            <button id="delete-all-btn" class="app-action-btn">DELETE ALL</button>
+                        </div>
+                    </div>
+                    <div class="todo-list-container">
+                        <ul id="todo-list">
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="music-app" class="app-view hidden">
+                    <div class="music-top">
+                        <div id="music-title">Select Tracks to Begin</div>
+                    </div>
+                    <div class="music-controls-wrapper">
+                        <div class="music-progress-container">
+                            <div id="music-progress-bar"></div>
+                        </div>
+                        <div class="music-buttons">
+                            <button id="music-prev-btn" class="app-action-btn">PREV</button>
+                            <button id="music-play-btn" class="app-action-btn">PLAY</button>
+                            <button id="music-next-btn" class="app-action-btn">NEXT</button>
+                            <button id="music-loop-btn" class="app-action-btn">LOOP</button>
+                        </div>
+                        <label for="music-file-input" class="app-action-btn file-input-label">LOAD FILES</label>
+                        <input type="file" id="music-file-input" accept="audio/*" multiple>
+                    </div>
+                </div>
+
+                <div id="trivia-app" class="app-view hidden">
+                    <div class="trivia-question-wrapper">
+                        <div id="trivia-category">LOADING...</div>
+                        <div id="trivia-question">...</div>
+                    </div>
+                    <div class="trivia-answer-wrapper">
+                        <input type="text" id="trivia-input" placeholder="YOUR ANSWER...">
+                        <button id="trivia-submit-btn" class="app-action-btn">SUBMIT</button>
+                        <button id="trivia-next-btn" class="app-action-btn">NEXT</button>
+                        <p id="trivia-message" class="message-line"></p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="dashboard">
+            <div class="system-apps">
+                <h3>SYSTEM APPLICATIONS</h3>
+                <div class="app-buttons">
+                    <button class="app-btn" data-app="music">
+                        <span class="icon">🎵</span> MUSIC
+                    </button>
+                    <button class="app-btn" data-app="timer">
+                        <span class="icon">⌛</span> TIMER
+                    </button>
+                    <button class="app-btn" data-app="todo">
+                        <span class="icon">📋</span> TO-DO
+                    </button>
+                    <button class="app-btn" data-app="trivia">
+                        <span class="icon">💡</span> TRIVIA
+                    </button>
+                </div>
+            </div>
+            <div class="logo-container">
+                <img src="dgc-lockup.png"
+                    alt="Google Developer Groups Logo" id="gdg-logo">
+            </div>
+            <div class="info-panel">
+                <div class="title">SideKick 1.0</div>
+                <div class="copyright">©1986 GDG Computer Systems, Inc.</div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="music-player"></audio>
+    <script src="HomePage.js"></script>
+</body>
+
+</html>
