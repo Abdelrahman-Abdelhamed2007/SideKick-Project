@@ -7,16 +7,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const appViews = document.querySelectorAll('.app-view');
     const monitor = document.querySelector('.monitor');
 
-    // --- Timer Elements ---
+    // --- Timer Elements (Updated) ---
     const timerApp = document.getElementById('timer-app');
     const timerHours = document.getElementById('timer-hours');
     const timerMinutes = document.getElementById('timer-minutes');
     const timerSeconds = document.getElementById('timer-seconds');
+    const timerInputGroup = document.querySelector('.timer-input-group'); // New
     const inputHours = document.getElementById('input-hours');
     const inputMinutes = document.getElementById('input-minutes');
     const inputSeconds = document.getElementById('input-seconds');
     const startPauseBtn = document.getElementById('start-pause-btn');
     const resetTimerBtn = document.getElementById('reset-timer-btn');
+    const timerModeBtn = document.getElementById('timer-mode-btn'); // New
     const timerMessage = document.getElementById('timer-message');
 
     // --- To-Do Elements ---
@@ -51,38 +53,50 @@ document.addEventListener('DOMContentLoaded', () => {
     let countdownInterval;
     let timeRemaining = 0;
     let timeElapsed = 0;
-    let timerMode = 'STOPWATCH';
+    let timerAppMode = 'COUNTDOWN'; // Replaces old 'timerMode'
     let chimeInterval;
     let musicPlaylist = [];
     let currentTrackIndex = 0;
     let currentTriviaAnswer = "";
-    let permanentBootText = ""; // Stores the "SideKick... READY." text
-
-    // ✅ NEW: Create a single AudioContext, initially 'null'
+    let permanentBootText = "";
     let audioCtx = null;
 
-    // --- Audio Logic (UPDATED) ---
-    // ✅ This function now manages the single audioCtx
+    // --- Audio Logic ---
     const createAudioContext = () => {
         if (audioCtx) {
-            // If it exists but is suspended (common on page load)
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
             return audioCtx;
         }
-        
-        // Create it for the first time
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return null;
-        
-        audioCtx = new AudioContext();
-        return audioCtx;
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+            const buffer = audioCtx.createBuffer(1, 1, 22050);
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioCtx.destination);
+            source.start(0);
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        } catch (e) {
+            console.error("Web Audio API is not supported in this browser");
+            return null;
+        }
+    };
+
+    const unlockAudio = () => {
+        if (!audioCtx) {
+            createAudioContext();
+        }
     };
 
     const beep = () => {
-        const context = createAudioContext();
-        if (!context) return;
+        if (!audioCtx) unlockAudio(); 
+        if (!audioCtx) return;
+        const context = audioCtx;
         const oscillator = context.createOscillator();
         const gainNode = context.createGain();
         oscillator.connect(gainNode);
@@ -93,9 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
         oscillator.start();
         oscillator.stop(context.currentTime + 0.1);
     };
+
     const playChimeBeep = () => {
-        const context = createAudioContext();
-        if (!context) return;
+        if (!audioCtx) return; 
+        const context = audioCtx;
         const oscillator = context.createOscillator();
         const gainNode = context.createGain();
         oscillator.connect(gainNode);
@@ -106,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         oscillator.start();
         oscillator.stop(context.currentTime + 0.1);
     };
+
     const startChimeSequence = () => {
         clearInterval(chimeInterval);
         let count = 0;
@@ -122,14 +138,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Core View Switching Logic ---
     const switchView = (appName) => {
-        // Hide the main terminal output
         terminalOutput.classList.add('hidden');
-        
-        // Hide all app views (including the launch-app view)
         appViews.forEach(view => view.classList.add('hidden'));
-
         if (appName === 'timer') {
             timerApp.classList.remove('hidden');
+            timerAppMode = 'COUNTDOWN'; // Default to countdown
+            updateTimerModeUI();
             resetTimer();
         } else if (appName === 'todo') {
             todoApp.classList.remove('hidden');
@@ -143,91 +157,67 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- Launch Sequence (UPDATED) ---
+    // --- Launch Sequence ---
     const launchAppSequence = (appName) => {
         const targetAppName = appName.toUpperCase();
         beep();
-
-        // ✅ 1. Hide the terminal and all other apps
         terminalOutput.classList.add('hidden');
         appViews.forEach(view => view.classList.add('hidden'));
-        
-        // ✅ 2. Show the dedicated launch screen
         launchApp.classList.remove('hidden');
-
-        clearInterval(countdownInterval); // Stop timer if running
-
+        clearInterval(countdownInterval);
         const baseLog = `> LAUNCHING ${targetAppName}`;
-        
-        // ✅ 3. Run animation inside the launch screen's text element
         launchText.innerHTML = baseLog + '..._';
-
         const totalDuration = 2000;
         const intervalDuration = totalDuration / 6;
         let dotCount = 1;
         const animationInterval = setInterval(() => {
             let dots = '.'.repeat(dotCount);
-            launchText.innerHTML = baseLog + dots + '_'; // Update launch screen
+            launchText.innerHTML = baseLog + dots + '_';
             dotCount++;
             if (dotCount > 3) dotCount = 1;
         }, intervalDuration);
-
-        // ✅ 4. After 2 seconds, switch to the real app
         setTimeout(() => {
             clearInterval(animationInterval);
-            // No cleanup needed, just switch the view.
-            // switchView will hide the launchApp screen.
             switchView(appName); 
         }, totalDuration);
     };
 
-    // --- Terminal Initial Typing (FIXED) ---
-    const bootLines = [
-        "SideKick OS v1.0.1",
-        "",
-        "READY."
-    ];
+    // --- Terminal Initial Typing ---
+    const bootLines = ["SideKick OS v1.0.1", "", "READY."];
     const promptLine = "SELECT AN APPLICATION TO BEGIN.";
-    
     let charIndex = 0;
     let lineIndex = 0;
     const typingSpeed = 50;
     const lineDelay = 500;
-
     function typeText() {
         if (lineIndex < bootLines.length) {
-            // Typing the "SideKick... READY." part
             const currentLine = bootLines[lineIndex];
-            
             if (charIndex < currentLine.length) {
                 let typingLine = currentLine.substring(0, charIndex + 1);
                 terminalOutput.innerHTML = permanentBootText + typingLine + '_'; 
                 charIndex++;
                 setTimeout(typeText, typingSpeed);
             } else {
-                // End of line. Add it to the permanent text
                 permanentBootText += currentLine + '<br>';
                 lineIndex++;
                 charIndex = 0;
                 setTimeout(typeText, lineDelay);
             }
         } else if (lineIndex === bootLines.length) {
-            // Boot lines are done. Type the final prompt line
             if (charIndex < promptLine.length) {
                 let typingPrompt = promptLine.substring(0, charIndex + 1);
                 terminalOutput.innerHTML = permanentBootText + typingPrompt + '_';
                 charIndex++;
                 setTimeout(typeText, typingSpeed);
             } else {
-                // Finished typing prompt
-                terminalOutput.innerHTML = permanentBootText + promptLine + '_'; // Final cursor
+                terminalOutput.innerHTML = permanentBootText + promptLine + '_';
                 lineIndex++;
             }
         }
     }
-    typeText(); // Start the boot sequence
+    typeText();
 
-    // --- 1. Timer Logic (Unchanged) ---
+    // --- 1. Timer Logic (RECONCEPTUALIZED) ---
     const formatTime = (totalSeconds) => {
         if (totalSeconds < 0) totalSeconds = 0;
         const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
@@ -235,15 +225,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const s = String(totalSeconds % 60).padStart(2, '0');
         return { h, m, s };
     };
+
     const updateDisplay = () => {
-        const totalSeconds = (timerMode === 'COUNTDOWN') ? timeRemaining : timeElapsed;
+        const totalSeconds = (timerAppMode === 'COUNTDOWN') ? timeRemaining : timeElapsed;
         const { h, m, s } = formatTime(totalSeconds);
         timerHours.textContent = h;
         timerMinutes.textContent = m;
         timerSeconds.textContent = s;
     };
+
+    const updateTimerModeUI = () => {
+        if (timerAppMode === 'COUNTDOWN') {
+            timerInputGroup.classList.remove('hidden');
+            timerMessage.textContent = "MODE: COUNTDOWN";
+        } else { // STOPWATCH mode
+            timerInputGroup.classList.add('hidden');
+            timerMessage.textContent = "MODE: STOPWATCH";
+        }
+    };
+
+    const toggleTimerMode = () => {
+        timerAppMode = (timerAppMode === 'COUNTDOWN') ? 'STOPWATCH' : 'COUNTDOWN';
+        updateTimerModeUI();
+        resetTimer();
+    };
+
     const startStopwatch = () => {
-        timerMode = 'STOPWATCH';
         startPauseBtn.textContent = 'PAUSE';
         timerMessage.textContent = "STOPWATCH RUNNING...";
         countdownInterval = setInterval(() => {
@@ -251,8 +258,8 @@ document.addEventListener('DOMContentLoaded', () => {
             updateDisplay();
         }, 1000);
     };
+
     const startCountdown = (totalSeconds) => {
-        timerMode = 'COUNTDOWN';
         timeRemaining = totalSeconds;
         updateDisplay();
         startPauseBtn.textContent = 'PAUSE';
@@ -271,40 +278,58 @@ document.addEventListener('DOMContentLoaded', () => {
             updateDisplay();
         }, 1000);
     };
+
     const toggleTimer = () => {
+        unlockAudio(); // Unlock audio on first timer click
+
         if (startPauseBtn.textContent === 'START') {
-            const h = parseInt(inputHours.value) || 0;
-            const m = parseInt(inputMinutes.value) || 0;
-            const s = parseInt(inputSeconds.value) || 0;
-            const totalSeconds = (h * 3600) + (m * 60) + s;
-            inputHours.value = ''; inputMinutes.value = ''; inputSeconds.value = '';
-            if (totalSeconds > 0) startCountdown(totalSeconds);
-            else startStopwatch();
-        } else {
+            if (timerAppMode === 'COUNTDOWN') {
+                const h = parseInt(inputHours.value) || 0;
+                const m = parseInt(inputMinutes.value) || 0;
+                const s = parseInt(inputSeconds.value) || 0;
+                const totalSeconds = (h * 3600) + (m * 60) + s;
+                inputHours.value = ''; inputMinutes.value = ''; inputSeconds.value = '';
+                
+                if (totalSeconds > 0) {
+                    startCountdown(totalSeconds);
+                } else {
+                    timerMessage.textContent = "ENTER TIME FOR COUNTDOWN";
+                }
+            } else { // STOPWATCH mode
+                startStopwatch();
+            }
+        } else { // PAUSE logic
             clearInterval(countdownInterval);
             startPauseBtn.textContent = 'START';
-            timerMessage.textContent = `${timerMode} PAUSED.`;
+            timerMessage.textContent = `${timerAppMode} PAUSED.`;
         }
     };
+
     const resetTimer = () => {
         clearInterval(countdownInterval);
         clearInterval(chimeInterval);
-        timeRemaining = 0; timeElapsed = 0; timerMode = 'STOPWATCH';
+        timeRemaining = 0;
+        timeElapsed = 0;
         updateDisplay();
         startPauseBtn.textContent = 'START';
-        timerMessage.textContent = "SYSTEM READY.";
+        
+        // Reset message based on the current mode
+        updateTimerModeUI();
     };
+
     startPauseBtn.addEventListener('click', toggleTimer);
     resetTimerBtn.addEventListener('click', resetTimer);
+    timerModeBtn.addEventListener('click', toggleTimerMode); // Add listener for new button
 
-    // --- 2. To-Do Logic (Unchanged) ---
-    const getList = () => JSON.parse(localStorage.getItem('sidekick-todo-list') || '[]');
+    // --- 2. To-Do Logic ---
+    // ✅ OPTIMIZED: Added filter to prevent errors from corrupted localStorage
+    const getList = () => (JSON.parse(localStorage.getItem('sidekick-todo-list') || '[]')).filter(item => item && item.text);
     const saveList = (list) => localStorage.setItem('sidekick-todo-list', JSON.stringify(list));
     const renderList = () => {
         const list = getList();
         todoListElement.innerHTML = '';
         if (list.length === 0) {
-            todoListElement.innerHTML = '<li class="todo-item" style="cursor: default;">[ ] No tasks! Add one above.</li>';
+            todoListElement.innerHTML = '<li class="todo-item" style="cursor: default;">No tasks! Add one above.</li>';
             return;
         }
         list.forEach(item => {
@@ -348,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
     todoListElement.addEventListener('click', toggleAndDeleteItem);
     todoInput.addEventListener('keypress', (e) => e.key === 'Enter' && addItem());
 
-    // --- 3. Music Logic (Unchanged) ---
+    // --- 3. Music Logic ---
     const loadMusicState = () => {
         const state = JSON.parse(localStorage.getItem('sidekick-music-state') || '{}');
         currentTrackIndex = state.trackIndex || 0;
@@ -379,6 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (musicPlayBtn.textContent === 'PAUSE') musicPlayer.play();
     };
     const togglePlayPause = () => {
+        unlockAudio(); // Also unlock audio when playing music
         if (musicPlayer.paused) {
             musicPlayer.play();
             musicPlayBtn.textContent = 'PAUSE';
@@ -428,7 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
     musicPlayer.addEventListener('ended', () => !musicPlayer.loop && nextTrack());
     musicProgressContainer.addEventListener('click', setMusicProgress);
 
-    // --- 4. Trivia Logic (Unchanged) ---
+    // --- 4. Trivia Logic ---
     const decodeHTML = (html) => {
         const txt = document.createElement("textarea");
         txt.innerHTML = html;
@@ -473,7 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
     triviaNextBtn.addEventListener('click', getNewQuestion);
     triviaInput.addEventListener('keypress', (e) => e.key === 'Enter' && checkAnswer());
 
-    // --- Main App Button Handler (Unchanged) ---
+    // --- Main App Button Handler ---
     appButtons.forEach(button => {
         button.addEventListener('click', () => {
             const appName = button.getAttribute('data-app');
