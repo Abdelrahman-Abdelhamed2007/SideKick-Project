@@ -209,8 +209,7 @@ body {
 
 /* --- 6. APP: Timer --- */
 
-   to center the new timer block */
-#timer-app {
+to center the new timer block */ #timer-app {
     justify-content: center;
     align-items: center;
 
@@ -262,7 +261,6 @@ body {
     box-shadow: 0 0 10px #00ff66, inset 0 0 10px #003f1c;
 }
 
-/* ✅ FIX: Added flexbox to wrap the buttons */
 .timer-buttons {
     display: flex;
     flex-wrap: wrap;
@@ -319,7 +317,6 @@ body {
 
 
 /* --- 7. APP: To-Do List --- */
-/* ✅ FIX: Must override .app-view centering */
 #todo-app {
     justify-content: space-between;
     align-items: stretch;
