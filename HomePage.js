@@ -313,12 +313,22 @@ document.addEventListener('DOMContentLoaded', () => {
             timerMinutesInput.classList.remove('hidden');
             timerLapBtn.classList.add('hidden');
             timerLapList.classList.add('hidden');
+
+            timerStartBtn.classList.remove('hidden');
+            timerPauseBtn.classList.remove('hidden');
+            timerResetBtn.classList.remove('hidden');
+
             resetCountdownTimer();
             resetStopwatch();
         } else {
             timerMinutesInput.classList.add('hidden');
             timerLapBtn.classList.remove('hidden');
             timerLapList.classList.remove('hidden');
+
+            timerStartBtn.classList.remove('hidden');
+            timerPauseBtn.classList.remove('hidden');
+            timerResetBtn.classList.remove('hidden');
+
             resetCountdownTimer();
             resetStopwatch();
         }
@@ -349,12 +359,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- 6. Application Logic: TO-DO ---
-
-    // To-Do: Storage
     const getList = () => (JSON.parse(localStorage.getItem('sidekick-todo-list') || '[]')).filter(item => item && item.text);
     const saveList = (list) => localStorage.setItem('sidekick-todo-list', JSON.stringify(list));
-
-    // To-Do: DOM Manipulation
     const renderList = () => {
         const list = getList();
         todoListElement.innerHTML = '';
@@ -370,7 +376,6 @@ document.addEventListener('DOMContentLoaded', () => {
             todoListElement.appendChild(li);
         });
     };
-
     const addItem = () => {
         const text = todoInput.value.trim();
         if (text) {
@@ -382,7 +387,6 @@ document.addEventListener('DOMContentLoaded', () => {
             todoInput.focus();
         }
     };
-
     const toggleAndDeleteItem = (e) => {
         const li = e.target.closest('.todo-item');
         if (!li || !li.dataset.id) return;
@@ -394,22 +398,18 @@ document.addEventListener('DOMContentLoaded', () => {
             renderList();
         }, 300);
     };
-
     const deleteAllItems = () => {
         if (confirm("DELETE ALL tasks? This cannot be undone.")) {
             saveList([]);
             renderList();
         }
     };
-
     addTodoBtn.addEventListener('click', addItem);
     deleteAllBtn.addEventListener('click', deleteAllItems);
     todoListElement.addEventListener('click', toggleAndDeleteItem);
     todoInput.addEventListener('keypress', (e) => e.key === 'Enter' && addItem());
 
     // --- 7. Application Logic: MUSIC ---
-
-    // Music: Storage
     const loadMusicState = () => {
         const state = JSON.parse(localStorage.getItem('sidekick-music-state') || '{}');
         currentTrackIndex = state.trackIndex || 0;
@@ -431,8 +431,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         localStorage.setItem('sidekick-music-state', JSON.stringify(state));
     };
-
-    // Music: Player Controls
     const loadTrack = (index) => {
         if (musicPlaylist.length === 0) return;
         currentTrackIndex = index;
@@ -441,7 +439,6 @@ document.addEventListener('DOMContentLoaded', () => {
         musicPlayer.load();
         if (musicPlayBtn.textContent === 'PAUSE') musicPlayer.play();
     };
-
     const togglePlayPause = () => {
         unlockAudio();
         if (musicPlayer.paused) {
@@ -453,23 +450,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         saveMusicState();
     };
-
     const nextTrack = () => {
         currentTrackIndex = (currentTrackIndex + 1) % musicPlaylist.length;
         loadTrack(currentTrackIndex);
     };
-
     const prevTrack = () => {
         currentTrackIndex = (currentTrackIndex - 1 + musicPlaylist.length) % musicPlaylist.length;
         loadTrack(currentTrackIndex);
     };
-
     const toggleLoop = () => {
         musicPlayer.loop = !musicPlayer.loop;
         musicLoopBtn.style.color = musicPlayer.loop ? 'var(--screen-text)' : 'var(--button-text)';
         saveMusicState();
     };
-
     musicFileInput.addEventListener('change', (e) => {
         musicPlaylist = Array.from(e.target.files);
         if (musicPlaylist.length > 0) {
@@ -477,8 +470,6 @@ document.addEventListener('DOMContentLoaded', () => {
             musicPlayBtn.textContent = 'PLAY';
         }
     });
-
-    // Music: Progress Bar
     const updateMusicProgress = () => {
         if (musicPlayer.duration) {
             const progressPercent = (musicPlayer.currentTime / musicPlayer.duration) * 100;
@@ -491,7 +482,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const clickX = e.offsetX;
         musicPlayer.currentTime = (clickX / width) * musicPlayer.duration;
     };
-
     musicPlayBtn.addEventListener('click', togglePlayPause);
     musicNextBtn.addEventListener('click', nextTrack);
     musicPrevBtn.addEventListener('click', prevTrack);
@@ -501,14 +491,11 @@ document.addEventListener('DOMContentLoaded', () => {
     musicProgressContainer.addEventListener('click', setMusicProgress);
 
     // --- 8. Application Logic: TRIVIA ---
-
-    // Trivia: API Fetching
     const decodeHTML = (html) => {
         const txt = document.createElement("textarea");
         txt.innerHTML = html;
         return txt.value;
     };
-
     const getNewQuestion = async () => {
         triviaCategory.textContent = "LOADING...";
         triviaQuestion.textContent = "...";
@@ -532,8 +519,6 @@ document.addEventListener('DOMContentLoaded', () => {
             triviaQuestion.textContent = "Failed to load question. Check connection.";
         }
     };
-
-    // Trivia: Answer Logic
     const checkAnswer = () => {
         const userAnswer = triviaInput.value.trim().toLowerCase();
         const correctAnswer = currentTriviaAnswer.trim().toLowerCase();
@@ -546,14 +531,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         triviaSubmitBtn.disabled = true;
     };
-
     triviaSubmitBtn.addEventListener('click', checkAnswer);
     triviaNextBtn.addEventListener('click', getNewQuestion);
     triviaInput.addEventListener('keypress', (e) => e.key === 'Enter' && checkAnswer());
 
     // --- 9. Global Event Listeners ---
-
-    // Main App Button Handler
     appButtons.forEach(button => {
         button.addEventListener('click', () => {
             const appName = button.getAttribute('data-app');
