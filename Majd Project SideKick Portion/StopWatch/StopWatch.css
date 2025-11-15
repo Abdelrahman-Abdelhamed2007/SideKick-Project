@@ -1,0 +1,93 @@
+body {
+    background: #071109;
+    font-family: "Press Start 2P", cursive;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+
+.arcade-frame {
+   
+    background: #0f1a0f;
+    padding: 40px;
+    width: 450px;
+    text-align: center;
+    position: relative;
+
+    border: 6px solid #00ff66;
+
+    /* Pixel corner cuts */
+    clip-path: polygon(
+        0 20px, 20px 20px, 20px 0,
+        calc(100% - 20px) 0, calc(100% - 20px) 20px, 100% 20px,
+        100% calc(100% - 20px), calc(100% - 20px) calc(100% - 20px),
+        calc(100% - 20px) 100%, 20px 100%,
+        20px calc(100% - 20px), 0 calc(100% - 20px)
+    );
+
+    box-shadow:
+        0 0 8px #00ff66,
+        inset 0 0 10px #004420;
+}
+
+
+
+
+
+
+.title {
+
+    font-size: 20px;
+    color: #00ff88;
+    text-shadow:
+        3px 3px #004f22,
+        0 0 10px #00ff88,
+        0 0 20px #00ff44;
+}
+
+
+
+#timer {
+    font-size: 45px;
+    margin: 20px 0;
+    color: #00ff99;
+    text-shadow: 3px 3px #004422;
+}
+
+
+.buttons button {
+    font-family: "Press Start 2P";
+    padding: 15px 18px;
+    font-size: 12px;
+    background: #001a0a;
+    color: #00ffcc;
+    border: 4px solid #00ff88;
+    margin: 8px;
+    cursor: pointer;
+    box-shadow: 0 0 10px #00ff88;
+    transition: 0.1s;
+}
+
+.buttons button:hover {
+    background: #00ff88;
+    color: #000;
+    border-color: #fff;
+    transform: scale(1.1);
+}
+
+
+#lapList {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+    color: #00ffcc;
+    font-size: 12px;
+    text-shadow: 2px 2px #003f20;
+}
+
+#lapList li {
+    margin: 5px 0;
+}

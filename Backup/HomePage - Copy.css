@@ -1,23 +1,7 @@
-/* ---
-TABLE OF CONTENTS
-1.  :root (Theme Variables)
-2.  Global Styles
-3.  Monitor & Screen Styles
-4.  Dashboard & Components
-5.  App View General Styles
-6.  APP: Timer
-7.  APP: To-Do List
-8.  APP: Music Player
-9.  APP: Trivia
-10. APP: Launch Screen
---- */
-
-
-/* --- 1. :root (Theme Variables) --- */
 :root {
     --monitor-bg: #111;
     --screen-bg: #000;
-    --screen-text: #00ff41;
+    --screen-text: #00ff41; /* CRT green */
     --dashboard-bg: #40404a;
     --button-bg: #555560;
     --button-hover-bg: #60606b;
@@ -26,7 +10,7 @@ TABLE OF CONTENTS
     --light-text: #ccc;
 }
 
-/* --- 2. Global Styles --- */
+/* Global Reset and Font */
 body {
     margin: 0;
     padding: 0;
@@ -44,7 +28,7 @@ body {
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
 }
 
-/* --- 3. Monitor & Screen Styles --- */
+/* --- Monitor Section (Top Half) --- */
 .monitor {
     background-color: var(--screen-bg);
     border: 15px solid var(--monitor-bg);
@@ -63,16 +47,18 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: repeating-linear-gradient(0deg,
-            rgba(0, 0, 0, 0.15),
-            rgba(0, 0, 0, 0.15) 1px,
-            transparent 1px,
-            transparent 3px);
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 3px
+    );
     pointer-events: none;
 }
 
 .screen {
-    position: relative;
+    position: relative; 
     width: 100%;
     height: 100%;
     color: var(--screen-text);
@@ -82,7 +68,7 @@ body {
     text-shadow: 0 0 5px rgba(0, 255, 65, 0.6);
 }
 
-/* --- 4. Dashboard & Components --- */
+/* --- Dashboard Section (Bottom Half) --- */
 .dashboard {
     background-color: var(--dashboard-bg);
     padding: 15px 30px;
@@ -137,6 +123,7 @@ body {
     line-height: 1;
 }
 
+/* --- GDG Logo Container --- */
 .logo-container {
     flex-grow: 1;
     display: flex;
@@ -153,6 +140,7 @@ body {
     opacity: 0.6;
 }
 
+/* Info Panel (Right Side) */
 .info-panel {
     display: flex;
     flex-direction: column;
@@ -175,17 +163,16 @@ body {
     margin-bottom: 20px;
 }
 
-/* --- 5. App View General Styles --- */
+/* --- App View General Styles --- */
 .app-view {
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: absolute; 
+    top: 0; 
+    left: 0; 
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     padding: 20px;
     box-sizing: border-box;
     font-size: 1rem;
@@ -218,110 +205,78 @@ body {
 
 .message-line {
     color: var(--screen-text);
-    font-size: 0.7rem;
+    font-size: 0.7rem; 
     text-align: center;
-    height: 1em;
+    height: 1em; /* Reserve space */
 }
 
-/* --- 6. APP: Timer --- */
-#timer-app {
-    background: #021a0c;
-    padding: 40px;
-    width: 450px;
-    max-width: 80%;
+/* --- 1. Timer Application Styles (Updated) --- */
+.timer-top {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50%;
+}
+
+.timer-display {
+    font-size: 4rem;
+    color: var(--screen-text);
     text-align: center;
-    position: relative;
-    border: 8px solid #00ff66;
-    box-shadow:
-        0 0 0 4px #003f1c,
-        0 0 30px #00ff66,
-        inset 0 0 20px #00ff66;
-
-    clip-path: polygon(0 20px, 20px 20px, 20px 0,
-            calc(100% - 20px) 0, calc(100% - 20px) 20px, 100% 20px,
-            100% calc(100% - 20px), calc(100% - 20px) calc(100% - 20px),
-            calc(100% - 20px) 100%, 20px 100%,
-            20px calc(100% - 20px), 0 calc(100% - 20px));
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.8); 
 }
 
-.timer-title {
-    font-size: 18px;
-    margin-bottom: 12px;
-    color: #00ff99;
-    text-shadow: 3px 3px #003f1c;
-    margin-top: 0;
+.timer-controls-wrapper {
+    height: 50%; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
 }
 
-#timer-display-element {
-    font-size: 60px;
-    color: #00ff55;
-    margin: 15px 0;
-    text-shadow: 4px 4px #003f1c;
+.timer-input-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+    transition: opacity 0.2s, height 0.2s, margin 0.2s;
+    opacity: 1;
+    height: auto;
 }
 
-#timer-minutes-input {
-    font-family: "Press Start 2P";
-    background: #001207;
-    color: #00ff88;
-    border: 4px solid #00ff44;
-    width: 100px;
-    padding: 12px;
+.timer-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.timer-input-group.hidden {
+    opacity: 0;
+    pointer-events: none;
+    height: 0;
+    margin: 0;
+}
+
+.timer-input {
+    background: none;
+    border: 1px solid var(--screen-text);
+    color: var(--screen-text);
+    padding: 5px;
+    width: 60px;
     text-align: center;
-    font-size: 20px;
-    margin-bottom: 25px;
-    box-shadow: 0 0 10px #00ff66, inset 0 0 10px #003f1c;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    box-shadow: 0 0 5px rgba(0, 255, 65, 0.4);
 }
 
-.timer-buttons button {
-    font-family: "Press Start 2P";
-    padding: 15px 25px;
-    font-size: 14px;
-    cursor: pointer;
-    background: #001a0c;
-    color: #00ff88;
-    border: 4px solid #00ff55;
-    margin: 10px;
-    text-shadow: 2px 2px #003f1c;
-    box-shadow:
-        0 0 15px #00ff66,
-        inset 0 0 10px #003f1c;
-    transition: 0.1s;
+.timer-input::-webkit-outer-spin-button,
+.timer-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
-.timer-buttons button:hover {
-    background: #00ff66;
-    color: #001a0c;
-    border-color: white;
-    transform: scale(1.15);
-    box-shadow: 0 0 25px #00ff99;
-}
-
-.timer-buttons button:active {
-    transform: scale(0.95);
-}
-
-#timer-mode-btn {
-    font-size: 14px;
-    padding: 15px 25px;
-}
-
-#timer-lap-list {
-    margin-top: 20px;
-    padding: 0;
-    list-style: none;
-    color: #00ffcc;
-    font-size: 12px;
-    text-shadow: 2px 2px #003f20;
-    max-height: 100px;
-    overflow-y: auto;
-}
-
-#timer-lap-list li {
-    margin: 5px 0;
-}
-
-
-/* --- 7. APP: To-Do List --- */
+/* --- 2. TO-DO Application Styles --- */
 .todo-toolbar-wrapper {
     height: 50%;
     display: flex;
@@ -382,26 +337,15 @@ body {
 }
 
 .todo-item.checked .task-text {
-    color: #008822;
+    color: #008822; 
     text-decoration: line-through;
 }
 
-.todo-list-container::-webkit-scrollbar {
-    width: 10px;
-}
+.todo-list-container::-webkit-scrollbar { width: 10px; }
+.todo-list-container::-webkit-scrollbar-track { background: #000; border: 1px solid #005500; }
+.todo-list-container::-webkit-scrollbar-thumb { background-color: var(--screen-text); border-radius: 5px; border: 1px solid #000; }
 
-.todo-list-container::-webkit-scrollbar-track {
-    background: #000;
-    border: 1px solid #005500;
-}
-
-.todo-list-container::-webkit-scrollbar-thumb {
-    background-color: var(--screen-text);
-    border-radius: 5px;
-    border: 1px solid #000;
-}
-
-/* --- 8. APP: Music Player --- */
+/* --- 3. Music Application Styles --- */
 .music-top {
     flex-grow: 1;
     display: flex;
@@ -417,7 +361,7 @@ body {
 }
 
 .music-controls-wrapper {
-    height: 50%;
+    height: 50%; 
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -425,14 +369,15 @@ body {
 }
 
 .music-progress-container {
-    width: 80%;
-    height: 10px;
+width: 80%;
+    height: 10px; /* Set total height to 10px */
     background-color: #005500;
     border: 1px solid var(--screen-text);
     cursor: pointer;
-    margin-bottom: 20px;
-    box-sizing: border-box;
-    font-size: 0;
+    margin-bottom: 20px; /* Restored original margin for spacing */
+    box-sizing: border-box; /* ✅ This is the key: forces border *inside* the 10px */
+    font-size: 0; /* ✅ Prevents layout issues from whitespace */
+
 }
 
 #music-progress-bar {
@@ -456,7 +401,7 @@ body {
     font-size: 0.7rem;
 }
 
-/* --- 9. APP: Trivia --- */
+/* --- 4. Trivia Application Styles --- */
 .trivia-question-wrapper {
     flex-grow: 1;
     display: flex;
@@ -478,7 +423,7 @@ body {
 }
 
 .trivia-answer-wrapper {
-    height: 40%;
+    height: 40%; 
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -497,13 +442,12 @@ body {
     margin-bottom: 15px;
 }
 
-#trivia-submit-btn,
-#trivia-next-btn {
+#trivia-submit-btn, #trivia-next-btn {
     width: 70%;
     margin-bottom: 10px;
 }
 
-/* --- 10. APP: Launch Screen --- */
+/* --- 5. Launch Sequence Screen --- */
 #launch-app {
     justify-content: center;
     align-items: center;

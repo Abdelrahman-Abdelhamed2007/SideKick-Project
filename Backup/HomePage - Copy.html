@@ -1,22 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SideKick OS v1.0.1</title>
-
     <link rel="stylesheet" href="HomePage.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
-
 <body>
-
     <div class="container">
-
         <div class="monitor">
             <div class="screen">
-
                 <p id="terminal-output"></p>
 
                 <div id="launch-app" class="app-view hidden">
@@ -24,26 +18,27 @@
                 </div>
 
                 <div id="timer-app" class="app-view hidden">
-
-                    <h1 class="timer-title">STUDY TIMER</h1>
-                    <h1 id="timer-display-element">00:00.00</h1>
-
-                    <input id="timer-minutes-input" type="number" value="25" min="1">
-
-                    <div class="timer-buttons">
-                        <button id="timer-start-btn">START</button>
-                        <button id="timer-pause-btn">PAUSE</button>
-                        <button id="timer-reset-btn">RESET</button>
-                        <button id="timer-lap-btn">LAP</button>
-                        <button id="timer-mode-btn">MODE</button>
+                    
+                    <div class="timer-top">
+                        <div class="timer-display">
+                            <span id="timer-hours">00</span>:<span id="timer-minutes">00</span>:<span id="timer-seconds">00</span>
+                        </div>
                     </div>
 
-                    <ul id="timer-lap-list"></ul>
-
-                    <audio id="timer-alarm-sound">
-                        <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
-                    </audio>
-
+                    <div class="timer-controls-wrapper">
+                        <div class="timer-input-group">
+                            <input type="number" class="timer-input" id="input-hours" placeholder="HRS" min="0" max="99">
+                            <input type="number" class="timer-input" id="input-minutes" placeholder="MIN" min="0" max="59">
+                            <input type="number" class="timer-input" id="input-seconds" placeholder="SEC" min="0" max="59">
+                        </div>
+                        
+                        <div class="timer-controls">
+                            <button id="start-pause-btn" class="app-action-btn">START</button>
+                            <button id="reset-timer-btn" class="app-action-btn">RESET</button>
+                            <button id="timer-mode-btn" class="app-action-btn">MODE</button>
+                        </div>
+                        <p id="timer-message" class="message-line"></p>
+                    </div>
                 </div>
 
                 <div id="todo-app" class="app-view hidden">
@@ -56,7 +51,7 @@
                     </div>
                     <div class="todo-list-container">
                         <ul id="todo-list">
-                        </ul>
+                            </ul>
                     </div>
                 </div>
 
@@ -94,9 +89,7 @@
 
             </div>
         </div>
-
         <div class="dashboard">
-
             <div class="system-apps">
                 <h3>SYSTEM APPLICATIONS</h3>
                 <div class="app-buttons">
@@ -114,22 +107,17 @@
                     </button>
                 </div>
             </div>
-
             <div class="logo-container">
                 <img src="dgc-lockup.png" alt="Google Developer Groups Logo" id="gdg-logo">
             </div>
-
             <div class="info-panel">
                 <div class="title">SideKick 1.0</div>
                 <div class="copyright">©1986 GDG Computer Systems, Inc.</div>
             </div>
-
         </div>
     </div>
-
+    
     <audio id="music-player"></audio>
-
     <script src="HomePage.js"></script>
 </body>
-
 </html>

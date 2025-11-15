@@ -1,0 +1,35 @@
+
+
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8-Bit Study Timer</title>
+    <link rel="stylesheet" href="Timer.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    
+    <div class="container">
+        <h1 class="title">STUDY TIMER</h1>
+        <h1 id="timer">25:00</h1>
+
+        <input id="minutesInput" type="number" value="25" min="1">
+
+        <div class="buttons">
+            <button id="startBtn">START</button>
+            <button id="pauseBtn">PAUSE</button>
+            <button id="resetBtn">RESET</button>
+        </div>
+
+        <audio id="alarmSound">
+            <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+        </audio>
+    </div>
+ <script src="Timer.js"></script>
+
+</body>
+
+</html>
