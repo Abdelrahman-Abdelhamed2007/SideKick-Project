@@ -28,7 +28,11 @@
                     <h1 class="timer-title">STUDY TIMER</h1>
                     <h1 id="timer-display-element">00:00.00</h1>
 
-                    <input id="timer-minutes-input" type="number" value="25" min="1">
+                    <div id="timer-inputs-row">
+                        <input id="timer-hours-input" type="number" placeholder="HRS" min="0" max="99">
+                        <input id="timer-minutes-input" type="number" placeholder="MIN" min="0" max="59">
+                        <input id="timer-seconds-input" type="number" placeholder="SEC" min="0" max="59">
+                    </div>
 
                     <div class="timer-buttons">
                         <button id="timer-start-btn">START</button>
@@ -47,14 +51,12 @@
                 </div>
 
                 <div id="todo-app" class="app-view hidden">
-                    <div class="todo-toolbar-wrapper">
-                        <div class="todo-toolbar">
-                            <input type="text" id="todo-input" placeholder="ENTER NEW TASK" maxlength="100">
-                            <button id="add-todo-btn" class="app-action-btn">ADD</button>
-                            <button id="delete-all-btn" class="app-action-btn">DELETE ALL</button>
+                    <div class="todo-container-inner">
+                        <div class="input-section">
+                            <input type="text" id="todo-input" placeholder="New Task...">
+                            <button id="add-todo-btn">ADD</button>
+                            <button id="delete-all-btn">CLEAR</button>
                         </div>
-                    </div>
-                    <div class="todo-list-container">
                         <ul id="todo-list">
                         </ul>
                     </div>

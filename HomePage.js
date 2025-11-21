@@ -8,7 +8,7 @@ TABLE OF CONTENTS
     - View Switching
     - Launch Sequence
     - Terminal Boot
-5.  Application Logic: TIMER
+5.  Application Logic: TIMER (UPDATED with HRS/MIN/SEC)
     - Countdown Mode
     - Stopwatch Mode
     - Timer Controller
@@ -39,7 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Timer Elements
     const timerApp = document.getElementById('timer-app');
     const timerDisplayElement = document.getElementById("timer-display-element");
+
+    // New Inputs
+    const timerInputsRow = document.getElementById("timer-inputs-row");
+    const timerHoursInput = document.getElementById("timer-hours-input");
     const timerMinutesInput = document.getElementById("timer-minutes-input");
+    const timerSecondsInput = document.getElementById("timer-seconds-input");
+
     const timerAlarm = document.getElementById("timer-alarm-sound");
     const timerStartBtn = document.getElementById("timer-start-btn");
     const timerPauseBtn = document.getElementById("timer-pause-btn");
@@ -215,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     typeText();
 
 
-    // --- 5. Application Logic: TIMER ---
+    // --- 5. Application Logic: TIMER (UPDATED) ---
 
     // Countdown Mode Functions
     function startCountdownTimer() {
@@ -224,9 +230,18 @@ document.addEventListener('DOMContentLoaded', () => {
         timerAlarm.pause();
 
         if (!isCountdownPaused) {
-            let minutes = parseInt(timerMinutesInput.value);
-            if (isNaN(minutes) || minutes < 1) minutes = 25;
-            countdownTimeLeft = minutes * 60;
+            const hours = parseInt(timerHoursInput.value) || 0;
+            const minutes = parseInt(timerMinutesInput.value) || 0;
+            const seconds = parseInt(timerSecondsInput.value) || 0;
+
+            // Calculate total seconds
+            countdownTimeLeft = (hours * 3600) + (minutes * 60) + seconds;
+
+            // Default to 25 mins if 0 is entered
+            if (countdownTimeLeft <= 0) {
+                countdownTimeLeft = 25 * 60;
+                timerMinutesInput.value = 25;
+            }
         }
         clearInterval(countdownTimerInterval);
         countdownTimerInterval = setInterval(updateCountdownTimer, 1000);
@@ -241,10 +256,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         countdownTimeLeft--;
-        let mins = Math.floor(countdownTimeLeft / 60);
-        let secs = countdownTimeLeft % 60;
+
+        // Format HH:MM:SS
+        let h = Math.floor(countdownTimeLeft / 3600);
+        let m = Math.floor((countdownTimeLeft % 3600) / 60);
+        let s = countdownTimeLeft % 60;
+
         timerDisplayElement.textContent =
-            `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     }
 
     function pauseCountdownTimer() {
@@ -255,11 +274,20 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetCountdownTimer() {
         clearInterval(countdownTimerInterval);
         isCountdownPaused = false;
-        let minutes = parseInt(timerMinutesInput.value);
-        if (isNaN(minutes) || minutes < 1) minutes = 25;
-        countdownTimeLeft = minutes * 60;
-        timerDisplayElement.textContent =
-            `${String(minutes).padStart(2, '0')}:00`;
+
+        // Read values to reset display to "Ready" state
+        const h = parseInt(timerHoursInput.value) || 0;
+        const m = parseInt(timerMinutesInput.value) || 0;
+        const s = parseInt(timerSecondsInput.value) || 0;
+
+        // Use 25m default if inputs are empty/zero
+        if (h === 0 && m === 0 && s === 0) {
+            timerDisplayElement.textContent = "00:25:00";
+        } else {
+            timerDisplayElement.textContent =
+                `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
         timerAlarm.pause();
         timerAlarm.currentTime = 0;
     }
@@ -310,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Timer Controller Logic
     function updateTimerModeUI() {
         if (timerAppMode === 'COUNTDOWN') {
-            timerMinutesInput.classList.remove('hidden');
+            timerInputsRow.classList.remove('hidden');
             timerLapBtn.classList.add('hidden');
             timerLapList.classList.add('hidden');
 
@@ -321,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resetCountdownTimer();
             resetStopwatch();
         } else {
-            timerMinutesInput.classList.add('hidden');
+            timerInputsRow.classList.add('hidden');
             timerLapBtn.classList.remove('hidden');
             timerLapList.classList.remove('hidden');
 
@@ -359,55 +387,88 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- 6. Application Logic: TO-DO ---
-    const getList = () => (JSON.parse(localStorage.getItem('sidekick-todo-list') || '[]')).filter(item => item && item.text);
-    const saveList = (list) => localStorage.setItem('sidekick-todo-list', JSON.stringify(list));
-    const renderList = () => {
-        const list = getList();
-        todoListElement.innerHTML = '';
-        if (list.length === 0) {
-            todoListElement.innerHTML = '<li class="todo-item" style="cursor: default;">No tasks! Add one above.</li>';
-            return;
-        }
-        list.forEach(item => {
-            const li = document.createElement('li');
-            li.className = 'todo-item';
-            li.dataset.id = item.id;
-            li.innerHTML = `<span class="task-text">${item.text}</span>`;
-            todoListElement.appendChild(li);
-        });
+    const getList = () => {
+        const stored = JSON.parse(localStorage.getItem('sidekick-todo-list') || '[]');
+        return Array.isArray(stored) ? stored : [];
     };
+    const saveList = (list) => localStorage.setItem('sidekick-todo-list', JSON.stringify(list));
     const addItem = () => {
         const text = todoInput.value.trim();
         if (text) {
             const list = getList();
-            list.push({ id: Date.now(), text: text });
+            const now = new Date();
+            const dateStr = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
+            const newItem = {
+                id: Date.now(),
+                text: text,
+                date: dateStr,
+                completed: false
+            };
+            list.push(newItem);
             saveList(list);
             renderList();
             todoInput.value = '';
             todoInput.focus();
         }
     };
-    const toggleAndDeleteItem = (e) => {
-        const li = e.target.closest('.todo-item');
-        if (!li || !li.dataset.id) return;
-        li.classList.add('checked');
-        setTimeout(() => {
-            let list = getList();
-            list = list.filter(item => item.id !== parseInt(li.dataset.id));
-            saveList(list);
-            renderList();
-        }, 300);
-    };
     const deleteAllItems = () => {
-        if (confirm("DELETE ALL tasks? This cannot be undone.")) {
+        if (confirm("DELETE ALL tasks?")) {
             saveList([]);
             renderList();
         }
     };
+    const renderList = () => {
+        const list = getList();
+        todoListElement.innerHTML = '';
+        if (list.length === 0) {
+            const li = document.createElement('li');
+            li.className = 'todo-item';
+            li.style.cursor = 'default';
+            li.textContent = "No tasks. Add one!";
+            todoListElement.appendChild(li);
+            return;
+        }
+        list.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'todo-item';
+            if (item.completed) li.classList.add('completed');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'todo-checkbox';
+            checkbox.checked = item.completed;
+            checkbox.addEventListener('change', () => {
+                item.completed = checkbox.checked;
+                saveList(list);
+                renderList();
+            });
+            const taskText = document.createElement('span');
+            taskText.textContent = item.text;
+            taskText.className = 'task-text';
+            if (item.completed) taskText.classList.add('completed');
+            const dateSpan = document.createElement('span');
+            dateSpan.textContent = item.date;
+            dateSpan.className = 'todo-date';
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'DEL';
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.addEventListener('click', () => {
+                const newList = list.filter(t => t.id !== item.id);
+                saveList(newList);
+                renderList();
+            });
+            li.appendChild(checkbox);
+            li.appendChild(taskText);
+            li.appendChild(dateSpan);
+            li.appendChild(deleteBtn);
+            todoListElement.appendChild(li);
+        });
+    };
     addTodoBtn.addEventListener('click', addItem);
     deleteAllBtn.addEventListener('click', deleteAllItems);
-    todoListElement.addEventListener('click', toggleAndDeleteItem);
-    todoInput.addEventListener('keypress', (e) => e.key === 'Enter' && addItem());
+    todoInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addItem();
+    });
+
 
     // --- 7. Application Logic: MUSIC ---
     const loadMusicState = () => {
@@ -491,11 +552,6 @@ document.addEventListener('DOMContentLoaded', () => {
     musicProgressContainer.addEventListener('click', setMusicProgress);
 
     // --- 8. Application Logic: TRIVIA ---
-    const decodeHTML = (html) => {
-        const txt = document.createElement("textarea");
-        txt.innerHTML = html;
-        return txt.value;
-    };
     const getNewQuestion = async () => {
         triviaCategory.textContent = "LOADING...";
         triviaQuestion.textContent = "...";
@@ -504,24 +560,23 @@ document.addEventListener('DOMContentLoaded', () => {
         triviaSubmitBtn.disabled = true;
         currentTriviaAnswer = "";
         try {
-            const response = await fetch('https://opentdb.com/api.php?amount=1');
+            const response = await fetch('https://the-trivia-api.com/api/questions?limit=1&difficulty=easy');
             const data = await response.json();
-            if (data.response_code !== 0) {
-                throw new Error('API returned an error.');
-            }
-            const questionData = data.results[0];
-            triviaCategory.textContent = `CATEGORY: ${decodeHTML(questionData.category)}`;
-            triviaQuestion.textContent = decodeHTML(questionData.question);
-            currentTriviaAnswer = decodeHTML(questionData.correct_answer);
+            if (!data || data.length === 0) throw new Error('No question received');
+            const questionData = data[0];
+            triviaCategory.textContent = `CATEGORY: ${questionData.category.toUpperCase()}`;
+            triviaQuestion.textContent = questionData.question;
+            currentTriviaAnswer = questionData.correctAnswer;
             triviaSubmitBtn.disabled = false;
         } catch (error) {
             triviaCategory.textContent = "ERROR";
             triviaQuestion.textContent = "Failed to load question. Check connection.";
         }
     };
+    const cleanAnswer = (str) => str ? str.trim().toLowerCase() : "";
     const checkAnswer = () => {
-        const userAnswer = triviaInput.value.trim().toLowerCase();
-        const correctAnswer = currentTriviaAnswer.trim().toLowerCase();
+        const userAnswer = cleanAnswer(triviaInput.value);
+        const correctAnswer = cleanAnswer(currentTriviaAnswer);
         if (userAnswer === correctAnswer) {
             triviaMessage.textContent = "CORRECT!";
             triviaMessage.style.color = 'var(--screen-text)';
@@ -543,4 +598,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-}); // End of DOMContentLoaded
+});
