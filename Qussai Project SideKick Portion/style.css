@@ -1,0 +1,137 @@
+body {
+    font-family: 'Courier New', monospace;
+    background-color: #000000; /* Black background */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.todo-container {
+    background: #000000; /* Black background */
+    padding: 30px;
+    border: 3px solid #00ff00; /* Green border */
+    border-radius: 0px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    width: 100%;
+    max-width: 600px;
+}
+
+h1 {
+    text-align: left;
+    color: #00ff00; /* Bright green */
+    text-transform: uppercase;
+    font-size: 24px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.input-section {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+#todo-input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #00ff00; /* Green border */
+    border-radius: 0px;
+    background-color: #000000; /* Black background */
+    color: #00ff00; /* Green text */
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+}
+
+#add-btn {
+    padding: 12px 24px;
+    background-color: #00ff00; /* Bright green */
+    color: #000000;
+    border: 2px solid #00ff00;
+    border-radius: 0px;
+    cursor: pointer;
+    margin-left: 10px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+#add-btn:hover {
+    background-color: #000000;
+    color: #00ff00;
+}
+
+#todo-list {
+    list-style: none;
+    padding: 0;
+}
+
+.todo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border: 2px solid #00ff00; /* Green border */
+    border-radius: 0px;
+    margin-bottom: 15px;
+    background-color: #000000; /* Black background */
+    color: #00ff00; /* Green text */
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+}
+
+.todo-item button {
+    background-color: #00ff00; /* Bright green */
+    color: #000000;
+    border: 2px solid #00ff00;
+    border-radius: 0px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.todo-item button:hover {
+    background-color: #000000;
+    color: #00ff00;
+}
+
+/* Checkbox styling */
+.todo-checkbox {
+    width: 20px;
+    height: 20px;
+    margin-right: 15px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 2px solid #00ff00;
+    background-color: #000000;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.todo-checkbox:checked::before {
+    content: "✓";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #00ff00;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.task-text {
+    flex: 1;
+    transition: all 0.3s;
+}
+
+.task-text.completed {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
