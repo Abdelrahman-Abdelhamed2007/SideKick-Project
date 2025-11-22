@@ -286,18 +286,6 @@ button:disabled {
 /* =========================================
    SECTION: TIMER / STOPWATCH
    ========================================= */
-#timer-app {
-    justify-content: center;
-    align-items: center;
-    background: #021a0c;
-    padding: 20px;
-    width: 450px;
-    max-width: 80%;
-    text-align: center;
-    position: relative;
-    border: 8px solid #00ff66;
-    box-shadow: 0 0 0 4px #003f1c, 0 0 30px #00ff66, inset 0 0 20px #00ff66;
-}
 
 .timer-title {
     font-size: 18px;
