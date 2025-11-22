@@ -36,95 +36,113 @@ const githubProvider = new GithubAuthProvider();
 /* =========================================
    SECTION: LOGIN / SIGNUP LOGIC
    ========================================= */
-document.addEventListener('DOMContentLoaded', () => {
 
-    // Cache DOM Elements
-    const loginModal = document.getElementById('login-modal');
-    const signupModal = document.getElementById('signup-modal');
-    const loginForm = document.getElementById('login-form');
-    const signupForm = document.getElementById('signup-form');
-    const showSignupBtn = document.getElementById('show-signup-btn');
-    const showLoginBtn = document.getElementById('show-login-btn');
-    const loginError = document.getElementById('login-error');
-    const signupError = document.getElementById('signup-error');
-    const googleBtn = document.getElementById('google-login-btn');
-    const githubBtn = document.getElementById('github-login-btn');
+// Cache DOM Elements
+const loginModal = document.getElementById('login-modal');
+const signupModal = document.getElementById('signup-modal');
+const loginForm = document.getElementById('login-form');
+const signupForm = document.getElementById('signup-form');
+const showSignupBtn = document.getElementById('show-signup-btn');
+const showLoginBtn = document.getElementById('show-login-btn');
+const loginError = document.getElementById('login-error');
+const signupError = document.getElementById('signup-error');
+const googleBtn = document.getElementById('google-login-btn');
+const githubBtn = document.getElementById('github-login-btn');
 
-    // 1. The Gatekeeper (Redirect if logged in)
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            window.location.replace('HomePage.html');
-        }
-    });
+// 1. The Gatekeeper (Redirect if logged in)
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // Store user info for personalization (optional)
+        localStorage.setItem('currentUser', JSON.stringify({
+            email: user.email,
+            uid: user.uid
+        }));
+        window.location.replace('HomePage.html');
+    }
+});
 
-    // 2. Social Login Handler
-    async function handleSocialLogin(provider) {
-        try {
-            loginError.style.color = '#00ff41';
-            loginError.textContent = 'CONNECTING...';
-            await signInWithPopup(auth, provider);
-        } catch (error) {
-            loginError.style.color = '#ff0000';
-            loginError.textContent = 'LOGIN FAILED: ' + error.message;
-        }
+// 2. Social Login Handler
+async function handleSocialLogin(provider) {
+    try {
+        loginError.style.color = '#00ff41';
+        loginError.textContent = 'CONNECTING...';
+        await signInWithPopup(auth, provider);
+    } catch (error) {
+        console.error(error);
+        loginError.style.color = '#ff0000';
+        loginError.textContent = 'LOGIN FAILED: ' + error.message;
+    }
+}
+
+// 3. Email Sign Up Handler
+async function handleSignup(e) {
+    e.preventDefault();
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const confirmPassword = document.getElementById('signup-confirm-password').value;
+
+    if (password !== confirmPassword) {
+        signupError.textContent = 'PASSWORDS DO NOT MATCH';
+        return;
     }
 
-    // 3. Email Sign Up Handler
-    async function handleSignup(e) {
-        e.preventDefault();
-        const email = document.getElementById('signup-email').value;
-        const password = document.getElementById('signup-password').value;
-        const confirmPassword = document.getElementById('signup-confirm-password').value;
-
-        if (password !== confirmPassword) {
-            signupError.textContent = 'PASSWORDS DO NOT MATCH';
-            return;
-        }
-
-        try {
-            signupError.style.color = '#00ff41';
-            signupError.textContent = 'CREATING ACCOUNT...';
-            await createUserWithEmailAndPassword(auth, email, password);
-        } catch (error) {
-            signupError.style.color = '#ff0000';
-            signupError.textContent = 'ERROR: ' + error.message;
-        }
+    try {
+        signupError.style.color = '#00ff41';
+        signupError.textContent = 'CREATING ACCOUNT...';
+        await createUserWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+        signupError.style.color = '#ff0000';
+        // Error handling map
+        const errorMap = {
+            'auth/email-already-in-use': 'EMAIL ALREADY REGISTERED',
+            'auth/weak-password': 'PASSWORD TOO WEAK (6+ CHARS)',
+            'auth/invalid-email': 'INVALID EMAIL ADDRESS'
+        };
+        signupError.textContent = errorMap[error.code] || ('ERROR: ' + error.message);
     }
+}
 
-    // 4. Email Login Handler
-    async function handleLogin(e) {
-        e.preventDefault();
-        const email = document.getElementById('login-username').value;
-        const password = document.getElementById('login-password').value;
+// 4. Email Login Handler
+async function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
 
-        try {
-            loginError.style.color = '#00ff41';
-            loginError.textContent = 'AUTHENTICATING...';
-            await signInWithEmailAndPassword(auth, email, password);
-        } catch (error) {
-            loginError.style.color = '#ff0000';
-            loginError.textContent = 'INVALID EMAIL OR PASSWORD';
-        }
+    try {
+        loginError.style.color = '#00ff41';
+        loginError.textContent = 'AUTHENTICATING...';
+        await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+        console.error(error); // Helpful for debugging
+        loginError.style.color = '#ff0000';
+        loginError.textContent = 'INVALID EMAIL OR PASSWORD';
     }
+}
 
-    // Event Listeners
-    loginForm.addEventListener('submit', handleLogin);
-    signupForm.addEventListener('submit', handleSignup);
+// Event Listeners
+if (loginForm) loginForm.addEventListener('submit', handleLogin);
+if (signupForm) signupForm.addEventListener('submit', handleSignup);
+
+if (showSignupBtn) {
     showSignupBtn.addEventListener('click', () => {
         signupModal.classList.remove('hidden');
         loginModal.classList.add('hidden');
         signupForm.reset();
         signupError.textContent = '';
     });
+}
+
+if (showLoginBtn) {
     showLoginBtn.addEventListener('click', () => {
         loginModal.classList.remove('hidden');
         signupModal.classList.add('hidden');
         loginForm.reset();
         loginError.textContent = '';
     });
-    googleBtn.addEventListener('click', () => handleSocialLogin(googleProvider));
-    githubBtn.addEventListener('click', () => handleSocialLogin(githubProvider));
-});
+}
+
+if (googleBtn) googleBtn.addEventListener('click', () => handleSocialLogin(googleProvider));
+if (githubBtn) githubBtn.addEventListener('click', () => handleSocialLogin(githubProvider));
 
 /* =========================================
    END OF SECTION: LOGIN / SIGNUP LOGIC
