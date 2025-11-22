@@ -1,32 +1,32 @@
 /* ---
 TABLE OF CONTENTS
 1.  Initialization (DOMContentLoaded)
+    - Authentication Check (Gatekeeper)
 2.  DOM Element Caching
 3.  State Variables
 4.  Core App Logic
+    - Logout Functionality
     - Audio (Beep & Unlock)
     - View Switching
     - Launch Sequence
     - Terminal Boot
 5.  Application Logic: TIMER
-    - Countdown Mode
-    - Stopwatch Mode
-    - Timer Controller
 6.  Application Logic: TO-DO
-    - Storage
-    - DOM Manipulation
 7.  Application Logic: MUSIC
-    - Storage
-    - Player Controls
-    - Progress Bar
-8.  Application Logic: TRIVIA (UPDATED to Multiple Choice)
-    - API Fetching
-    - Answer Logic
+8.  Application Logic: TRIVIA
 9.  Global Event Listeners
 --- */
 
 // --- 1. Initialization (DOMContentLoaded) ---
 document.addEventListener('DOMContentLoaded', () => {
+
+    // === AUTHENTICATION CHECK (THE GATEKEEPER) ===
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+        // If no user is logged in, kick them back to the login page
+        window.location.href = 'index.html';
+        return; // Stop the rest of the code from running
+    }
 
     // --- 2. DOM Element Caching ---
     const terminalOutput = document.getElementById('terminal-output');
@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const appButtons = document.querySelectorAll('.app-btn');
     const appViews = document.querySelectorAll('.app-view');
     const monitor = document.querySelector('.monitor');
+    const logoutBtn = document.getElementById('logout-btn'); // New Logout Button
 
     // Timer Elements
     const timerApp = document.getElementById('timer-app');
@@ -95,6 +96,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- 4. Core App Logic ---
+
+    // Logout Logic
+    logoutBtn.addEventListener('click', () => {
+        // 1. Clear the session
+        localStorage.removeItem('currentUser');
+        // 2. Redirect to login page
+        window.location.href = 'index.html';
+    });
 
     // Audio (Beep & Unlock)
     const createAudioContext = () => {
@@ -182,8 +191,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }, totalDuration);
     };
 
-    // Terminal Boot
-    const bootLines = ["SideKick OS v1.0.1", "", "READY."];
+    // Terminal Boot (Modified to show username)
+    // We parse the user object to greet them by name!
+    const userObj = JSON.parse(currentUser);
+    const username = userObj.username ? userObj.username.toUpperCase() : "USER";
+
+    const bootLines = [
+        "SideKick OS v1.0.1",
+        `WELCOME, ${username}`,
+        "SYSTEM READY."
+    ];
     const promptLine = "SELECT AN APPLICATION TO BEGIN.";
     let charIndex = 0;
     let lineIndex = 0;
@@ -277,7 +294,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const m = parseInt(timerMinutesInput.value) || 0;
         const s = parseInt(timerSecondsInput.value) || 0;
 
-        // Use 25m default if inputs are empty/zero
         if (h === 0 && m === 0 && s === 0) {
             timerDisplayElement.textContent = "00:25:00";
         } else {
