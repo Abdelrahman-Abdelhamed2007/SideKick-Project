@@ -7,7 +7,7 @@ A retro, 1980s-style virtual operating system built with vanilla HTML, CSS, and 
 This project was built by:
 
 * **Abdelrahman** (ID: 202510542)
-* **Majd** (ID: \_\_\_\_\_\_\_\_)
+* **Majd** (ID: 202512370)
 * **Qussai** (ID: 202510258)
 
 ---
