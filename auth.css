@@ -1,5 +1,5 @@
 :root {
-    --screen-text: #00ff41; 
+    --screen-text: #00ff41;
     --monitor-bg: #111;
 }
 
@@ -36,8 +36,13 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .auth-modal-content {
@@ -151,5 +156,70 @@ body {
 
     .auth-error {
         font-size: 0.5rem;
+    }
+
+    /* --- New Social Login Styles --- */
+
+    .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 15px 0;
+        color: var(--screen-text);
+        font-size: 0.6rem;
+        opacity: 0.7;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid var(--screen-text);
+    }
+
+    .divider::before {
+        margin-right: 10px;
+    }
+
+    .divider::after {
+        margin-left: 10px;
+    }
+
+    .social-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .social-btn {
+        flex: 1;
+        padding: 12px;
+        font-family: 'Press Start 2P', monospace;
+        font-size: 0.6rem;
+        font-weight: bold;
+        border: 2px solid var(--screen-text);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s;
+        text-transform: uppercase;
+    }
+
+    .social-btn.google {
+        background-color: #db4437;
+        color: white;
+        border-color: #db4437;
+    }
+
+    .social-btn.github {
+        background-color: #333;
+        color: white;
+        border-color: #333;
+    }
+
+    .social-btn:hover {
+        opacity: 0.8;
+        transform: translateY(-2px);
     }
 }
