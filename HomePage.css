@@ -1,3 +1,6 @@
+/* =========================================
+   SECTION: DECLARATIONS / GLOBAL
+   ========================================= */
 :root {
     --monitor-bg: #111;
     --screen-bg: #000;
@@ -10,10 +13,6 @@
     --light-text: #ccc;
 }
 
-/* =========================================
-   1. GLOBAL & DESKTOP STYLES (Default)
-   ========================================= */
-
 body {
     margin: 0;
     padding: 0;
@@ -24,19 +23,15 @@ body {
     background-color: var(--monitor-bg);
     font-family: 'Press Start 2P', 'Consolas', monospace;
     color: var(--button-text);
-    /* Allow scrolling if the window is too short */
     overflow-y: auto;
 }
 
 .container {
-    /* PC View: Fixed 900px width */
     width: 900px;
-    /* Safety: Ensure it doesn't overflow smaller PC windows */
     max-width: 95vw;
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
 }
 
-/* Global Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -51,12 +46,14 @@ body {
     border-radius: 0;
 }
 
-/* Unified Button Style */
+/* Unified Button Styling */
 button.app-action-btn,
 .timer-buttons button,
 #todo-app button,
 .music-buttons button,
-#trivia-app button {
+#trivia-app button,
+.app-btn,
+#logout-btn {
     padding: 10px 15px;
     background-color: var(--screen-text);
     color: #000000;
@@ -74,7 +71,8 @@ button.app-action-btn:hover,
 .timer-buttons button:hover,
 #todo-app button:hover,
 .music-buttons button:hover,
-#trivia-app button:hover {
+#trivia-app button:hover,
+.app-btn:hover {
     background-color: #000000;
     color: var(--screen-text);
 }
@@ -86,6 +84,23 @@ button:disabled {
     color: var(--screen-text) !important;
 }
 
+.app-view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+.hidden {
+    display: none !important;
+}
+
 .message-line {
     color: var(--screen-text);
     font-size: 0.7rem;
@@ -94,14 +109,20 @@ button:disabled {
     margin-top: 10px;
 }
 
-/* --- Monitor (Top Half) --- */
+/* =========================================
+   END OF SECTION: DECLARATIONS / GLOBAL
+   ========================================= */
+
+
+/* =========================================
+   SECTION: LOGIN / LOGOUT / TERMINAL
+   ========================================= */
 .monitor {
     background-color: var(--screen-bg);
     border: 15px solid var(--monitor-bg);
     border-radius: 5px 5px 0 0;
     padding: 20px;
     height: 450px;
-    /* Fixed height for PC */
     overflow: hidden;
     position: relative;
     box-sizing: border-box;
@@ -114,11 +135,7 @@ button:disabled {
     left: 0;
     width: 100%;
     height: 100%;
-    background: repeating-linear-gradient(0deg,
-            rgba(0, 0, 0, 0.15),
-            rgba(0, 0, 0, 0.15) 1px,
-            transparent 1px,
-            transparent 3px);
+    background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15) 1px, transparent 1px, transparent 3px);
     pointer-events: none;
     z-index: 10;
 }
@@ -134,13 +151,12 @@ button:disabled {
     text-shadow: 0 0 5px rgba(0, 255, 65, 0.6);
 }
 
-/* --- Dashboard (Bottom Half) --- */
+/* Dashboard */
 .dashboard {
     background-color: var(--dashboard-bg);
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
-    /* Side-by-side layout for PC */
     align-items: flex-start;
     border-radius: 0 0 5px 5px;
     gap: 30px;
@@ -165,23 +181,39 @@ button:disabled {
 .app-btn {
     display: flex;
     align-items: center;
-    padding: 8px 15px;
     background-color: var(--button-bg);
     color: var(--button-text);
     border: none;
     border-radius: 3px;
-    cursor: pointer;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 10px;
-    line-height: 1.2;
-    text-transform: uppercase;
-    text-align: left;
-    transition: background-color 0.15s;
     box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+    font-size: 10px;
+    text-align: left;
+    padding: 8px 15px;
 }
 
 .app-btn:hover {
     background-color: var(--button-hover-bg);
+    color: var(--button-text);
+}
+
+#logout-btn {
+    grid-column: 1 / -1;
+    background-color: #ff4141;
+    color: white;
+    border: 2px solid #ff4141;
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    border-radius: 3px;
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+    font-size: 10px;
+    padding: 8px 15px;
+}
+
+#logout-btn:hover {
+    background-color: #000;
+    color: #ff4141;
 }
 
 .icon {
@@ -228,28 +260,37 @@ button:disabled {
     margin-bottom: 20px;
 }
 
-/* --- App Views --- */
-.app-view {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    box-sizing: border-box;
-    font-size: 1rem;
+/* Launch */
+#launch-app {
+    justify-content: center;
+    align-items: center;
 }
 
-.hidden {
-    display: none !important;
+#launch-text {
+    font-size: 1.2rem;
+    text-shadow: 0 0 5px rgba(0, 255, 65, 0.6);
+    white-space: pre-wrap;
 }
 
-/* APP 1: Timer */
+/* =========================================
+   END OF SECTION: LOGIN / LOGOUT / TERMINAL
+   ========================================= */
+
+
+/* =========================================
+   SECTION: TIMER / STOPWATCH
+   ========================================= */
 #timer-app {
     justify-content: center;
     align-items: center;
+    background: #021a0c;
+    padding: 20px;
+    width: 450px;
+    max-width: 80%;
+    text-align: center;
+    position: relative;
+    border: 8px solid #00ff66;
+    box-shadow: 0 0 0 4px #003f1c, 0 0 30px #00ff66, inset 0 0 20px #00ff66;
 }
 
 .timer-title {
@@ -327,7 +368,95 @@ button:disabled {
     margin: 5px 0;
 }
 
-/* APP 2: To-Do */
+/* =========================================
+   END OF SECTION: TIMER / STOPWATCH
+   ========================================= */
+
+
+/* =========================================
+   SECTION: MUSIC PLAYER
+   ========================================= */
+#music-app {
+    justify-content: space-between;
+    align-items: center;
+}
+
+.music-top {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50%;
+}
+
+#music-title {
+    font-size: 1rem;
+    text-align: center;
+    color: var(--screen-text);
+}
+
+.music-controls-wrapper {
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.music-progress-container {
+    width: 80%;
+    height: 10px;
+    background-color: #005500;
+    border: 1px solid var(--screen-text);
+    cursor: pointer;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    font-size: 0;
+}
+
+#music-progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: var(--screen-text);
+}
+
+.music-buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+#music-file-input {
+    display: none;
+}
+
+.file-input-label {
+    padding: 10px 15px;
+    background-color: var(--screen-text);
+    color: #000000;
+    border: 2px solid var(--screen-text);
+    cursor: pointer;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.1s;
+}
+
+.file-input-label:hover {
+    background-color: #000000;
+    color: var(--screen-text);
+}
+
+/* =========================================
+   END OF SECTION: MUSIC PLAYER
+   ========================================= */
+
+
+/* =========================================
+   SECTION: TO-DO
+   ========================================= */
 #todo-app {
     justify-content: flex-start;
     align-items: center;
@@ -430,81 +559,27 @@ button:disabled {
     flex-shrink: 0;
 }
 
-/* APP 3: Music */
-#music-app {
-    justify-content: space-between;
-    align-items: center;
+#todo-list::-webkit-scrollbar {
+    width: 8px;
 }
 
-.music-top {
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50%;
+#todo-list::-webkit-scrollbar-track {
+    background: #000;
+    border-left: 1px solid var(--screen-text);
 }
 
-#music-title {
-    font-size: 1rem;
-    text-align: center;
-    color: var(--screen-text);
-}
-
-.music-controls-wrapper {
-    height: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-}
-
-.music-progress-container {
-    width: 80%;
-    height: 10px;
-    background-color: #005500;
-    border: 1px solid var(--screen-text);
-    cursor: pointer;
-    margin-bottom: 20px;
-    box-sizing: border-box;
-    font-size: 0;
-}
-
-#music-progress-bar {
-    width: 0%;
-    height: 100%;
+#todo-list::-webkit-scrollbar-thumb {
     background-color: var(--screen-text);
 }
 
-.music-buttons {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-}
+/* =========================================
+   END OF SECTION: TO-DO
+   ========================================= */
 
-#music-file-input {
-    display: none;
-}
 
-.file-input-label {
-    padding: 10px 15px;
-    background-color: var(--screen-text);
-    color: #000000;
-    border: 2px solid var(--screen-text);
-    cursor: pointer;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.7rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    transition: background-color 0.1s;
-}
-
-.file-input-label:hover {
-    background-color: #000000;
-    color: var(--screen-text);
-}
-
-/* APP 4: Trivia */
+/* =========================================
+   SECTION: TRIVIA
+   ========================================= */
 #trivia-app {
     justify-content: space-between;
     align-items: center;
@@ -561,53 +636,35 @@ button:disabled {
     margin-bottom: 10px;
 }
 
-/* Launch Screen */
-#launch-app {
-    justify-content: center;
-    align-items: center;
-}
-
-#launch-text {
-    font-size: 1.2rem;
-    text-shadow: 0 0 5px rgba(0, 255, 65, 0.6);
-    white-space: pre-wrap;
-}
+/* =========================================
+   END OF SECTION: TRIVIA
+   ========================================= */
 
 
 /* =========================================
-   2. MOBILE RESPONSIVE OVERRIDES
+   SECTION: MOBILE RESPONSIVE
    ========================================= */
 @media (max-width: 768px) {
-
     body {
         padding: 20px 10px;
-        /* Less padding on sides */
         align-items: flex-start;
-        /* Allow scrolling from top */
         height: auto;
-        /* Allow body to grow */
     }
 
     .container {
         width: 100%;
         max-width: 100%;
         box-shadow: none;
-        /* Remove glow to save space */
     }
 
-    /* MONITOR: Adjust height for mobile */
     .monitor {
         height: 50vh;
-        /* Use 50% of screen height */
         min-height: 300px;
         max-height: 500px;
         padding: 10px;
-        /* Less padding inside */
         border-width: 10px;
-        /* Thinner bezel */
     }
 
-    /* DASHBOARD: Stack vertically */
     .dashboard {
         flex-direction: column;
         align-items: center;
@@ -616,7 +673,6 @@ button:disabled {
         height: auto;
     }
 
-    /* Make dashboard sections fill width */
     .system-apps,
     .logo-container,
     .info-panel {
@@ -627,34 +683,30 @@ button:disabled {
 
     .app-buttons {
         width: 100%;
-        /* Fill width */
         gap: 10px;
     }
 
     .app-btn {
         justify-content: center;
-        /* Center button text */
         font-size: 0.7rem;
-        /* Smaller font */
+    }
+
+    #logout-btn {
+        font-size: 0.7rem;
     }
 
     .info-panel {
         align-items: center;
-        /* Center text */
         padding-top: 0;
     }
 
-    /* --- APP SPECIFIC ADJUSTMENTS --- */
-
-    /* Timer */
+    /* App Adjustments */
     #timer-display-element {
         font-size: 2.5rem;
-        /* Smaller timer font */
     }
 
     #timer-inputs-row input {
         width: 50px;
-        /* Smaller inputs */
         font-size: 12px;
     }
 
@@ -663,20 +715,16 @@ button:disabled {
         font-size: 0.5rem;
     }
 
-    /* To-Do */
     .input-section {
         flex-wrap: wrap;
-        /* Allow wrapping on very narrow screens */
     }
 
     #todo-input {
         min-width: 100%;
-        /* Input takes full row */
     }
 
     #todo-app button {
         flex-grow: 1;
-        /* Buttons share row */
     }
 
     .todo-item {
@@ -685,10 +733,8 @@ button:disabled {
 
     .todo-date {
         display: none;
-        /* Hide date on mobile to save space */
     }
 
-    /* Music */
     .music-buttons {
         flex-wrap: wrap;
         justify-content: center;
@@ -699,7 +745,6 @@ button:disabled {
         font-size: 0.5rem;
     }
 
-    /* Trivia */
     #trivia-question {
         font-size: 0.8rem;
     }
@@ -708,3 +753,7 @@ button:disabled {
         width: 100%;
     }
 }
+
+/* =========================================
+   END OF SECTION: MOBILE RESPONSIVE
+   ========================================= */

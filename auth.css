@@ -1,9 +1,11 @@
+/* =========================================
+   SECTION: DECLARATIONS / GLOBAL
+   ========================================= */
 :root {
     --screen-text: #00ff41;
     --monitor-bg: #111;
 }
 
-/* --- Global Styles --- */
 body {
     margin: 0;
     padding: 0;
@@ -20,7 +22,14 @@ body {
     display: none !important;
 }
 
-/* --- AUTHENTICATION MODALS --- */
+/* =========================================
+   END OF SECTION: DECLARATIONS / GLOBAL
+   ========================================= */
+
+
+/* =========================================
+   SECTION: LOGIN / LOGOUT STYLING
+   ========================================= */
 .auth-modal {
     position: fixed;
     top: 0;
@@ -86,10 +95,6 @@ body {
     outline: none;
 }
 
-.auth-modal-content input::placeholder {
-    color: rgba(0, 255, 65, 0.5);
-}
-
 .auth-modal-content input:focus {
     box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
 }
@@ -130,7 +135,7 @@ body {
     text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
 }
 
-/* --- SOCIAL LOGIN STYLES (Moved Global) --- */
+/* Social Login Styles */
 .divider {
     display: flex;
     align-items: center;
@@ -194,36 +199,16 @@ body {
     transform: translateY(-2px);
 }
 
-/* --- Responsive Design --- */
 @media (max-width: 768px) {
     .auth-modal-content {
         padding: 30px 20px;
     }
 
-    .auth-modal-content h2 {
-        font-size: 0.9rem;
-    }
-
-    .auth-modal-content h3 {
-        font-size: 0.8rem;
-    }
-
-    .auth-modal-content input {
-        font-size: 0.6rem;
-        padding: 12px;
-    }
-
-    .auth-btn {
-        font-size: 0.5rem;
-        padding: 12px 20px;
-    }
-
-    .auth-error {
-        font-size: 0.5rem;
-    }
-
-    /* Adjust social buttons for mobile */
     .social-buttons {
         flex-direction: column;
     }
 }
+
+/* =========================================
+   END OF SECTION: LOGIN / LOGOUT STYLING
+   ========================================= */

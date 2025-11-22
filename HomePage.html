@@ -10,6 +10,7 @@
 </head>
 
 <body>
+
     <div class="container">
         <div class="monitor">
             <div class="screen">
@@ -18,7 +19,6 @@
                 <div id="launch-app" class="app-view hidden">
                     <p id="launch-text"></p>
                 </div>
-
                 <div id="timer-app" class="app-view hidden">
                     <h1 class="timer-title">STUDY TIMER</h1>
                     <h1 id="timer-display-element">00:00.00</h1>
@@ -39,18 +39,6 @@
                         <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
                     </audio>
                 </div>
-
-                <div id="todo-app" class="app-view hidden">
-                    <div class="todo-container-inner">
-                        <div class="input-section">
-                            <input type="text" id="todo-input" placeholder="New Task...">
-                            <button id="add-todo-btn">ADD</button>
-                            <button id="delete-all-btn">CLEAR</button>
-                        </div>
-                        <ul id="todo-list"></ul>
-                    </div>
-                </div>
-
                 <div id="music-app" class="app-view hidden">
                     <div class="music-top">
                         <div id="music-title">Select Tracks to Begin</div>
@@ -69,7 +57,16 @@
                         <input type="file" id="music-file-input" accept="audio/*" multiple>
                     </div>
                 </div>
-
+                <div id="todo-app" class="app-view hidden">
+                    <div class="todo-container-inner">
+                        <div class="input-section">
+                            <input type="text" id="todo-input" placeholder="New Task...">
+                            <button id="add-todo-btn">ADD</button>
+                            <button id="delete-all-btn">CLEAR</button>
+                        </div>
+                        <ul id="todo-list"></ul>
+                    </div>
+                </div>
                 <div id="trivia-app" class="app-view hidden">
                     <div class="trivia-question-wrapper">
                         <div id="trivia-category">LOADING...</div>
@@ -85,7 +82,6 @@
                         <p id="trivia-message" class="message-line"></p>
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -93,18 +89,11 @@
             <div class="system-apps">
                 <h3>SYSTEM APPLICATIONS</h3>
                 <div class="app-buttons">
-                    <button class="app-btn" data-app="music">
-                        <span class="icon">🎵</span> MUSIC
-                    </button>
-                    <button class="app-btn" data-app="timer">
-                        <span class="icon">⌛</span> TIMER
-                    </button>
-                    <button class="app-btn" data-app="todo">
-                        <span class="icon">📋</span> TO-DO
-                    </button>
-                    <button class="app-btn" data-app="trivia">
-                        <span class="icon">💡</span> TRIVIA
-                    </button>
+                    <button class="app-btn" data-app="music"><span class="icon">🎵</span> MUSIC</button>
+                    <button class="app-btn" data-app="timer"><span class="icon">⌛</span> TIMER</button>
+                    <button class="app-btn" data-app="todo"><span class="icon">📋</span> TO-DO</button>
+                    <button class="app-btn" data-app="trivia"><span class="icon">💡</span> TRIVIA</button>
+                    <button id="logout-btn"><span class="icon">🛑</span> LOGOUT</button>
                 </div>
             </div>
             <div class="logo-container">
@@ -113,14 +102,12 @@
             <div class="info-panel">
                 <div class="title">SideKick 1.0</div>
                 <div class="copyright">©1986 GDG Computer Systems, Inc.</div>
-                <button id="logout-btn" class="app-action-btn"
-                    style="margin-top: 10px; background-color: #ff4141; color: white; border-color: #ff4141;">LOGOUT</button>
             </div>
         </div>
     </div>
 
     <audio id="music-player"></audio>
-    <script src="HomePage.js"></script>
+    <script type="module" src="HomePage.js"></script>
 </body>
 
 </html>

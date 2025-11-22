@@ -1,4 +1,6 @@
-// Import Firebase SDKs
+/* =========================================
+   SECTION: DECLARATIONS / GLOBAL IMPORTS
+   ========================================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
     getAuth,
@@ -21,17 +23,22 @@ const firebaseConfig = {
     measurementId: "G-YWNFVYM13Y"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-
-// Create Providers
 const googleProvider = new GoogleAuthProvider();
 const githubProvider = new GithubAuthProvider();
 
+/* =========================================
+   END OF SECTION: DECLARATIONS / GLOBAL
+   ========================================= */
+
+
+/* =========================================
+   SECTION: LOGIN / SIGNUP LOGIC
+   ========================================= */
 document.addEventListener('DOMContentLoaded', () => {
 
-    // DOM Element Caching
+    // Cache DOM Elements
     const loginModal = document.getElementById('login-modal');
     const signupModal = document.getElementById('signup-modal');
     const loginForm = document.getElementById('login-form');
@@ -40,35 +47,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const showLoginBtn = document.getElementById('show-login-btn');
     const loginError = document.getElementById('login-error');
     const signupError = document.getElementById('signup-error');
-
-    // New Buttons
     const googleBtn = document.getElementById('google-login-btn');
     const githubBtn = document.getElementById('github-login-btn');
 
-    // --- 1. The Gatekeeper ---
+    // 1. The Gatekeeper (Redirect if logged in)
     onAuthStateChanged(auth, (user) => {
         if (user) {
             window.location.replace('HomePage.html');
         }
     });
 
-    // --- 2. Social Login Logic ---
+    // 2. Social Login Handler
     async function handleSocialLogin(provider) {
         try {
             loginError.style.color = '#00ff41';
             loginError.textContent = 'CONNECTING...';
-
             await signInWithPopup(auth, provider);
-            // Redirect happens automatically by onAuthStateChanged
-
         } catch (error) {
-            console.error(error);
             loginError.style.color = '#ff0000';
             loginError.textContent = 'LOGIN FAILED: ' + error.message;
         }
     }
 
-    // --- 3. Email Sign Up Logic ---
+    // 3. Email Sign Up Handler
     async function handleSignup(e) {
         e.preventDefault();
         const email = document.getElementById('signup-email').value;
@@ -86,23 +87,11 @@ document.addEventListener('DOMContentLoaded', () => {
             await createUserWithEmailAndPassword(auth, email, password);
         } catch (error) {
             signupError.style.color = '#ff0000';
-            switch (error.code) {
-                case 'auth/email-already-in-use':
-                    signupError.textContent = 'EMAIL ALREADY REGISTERED';
-                    break;
-                case 'auth/weak-password':
-                    signupError.textContent = 'PASSWORD TOO WEAK (6+ CHARS)';
-                    break;
-                case 'auth/invalid-email':
-                    signupError.textContent = 'INVALID EMAIL ADDRESS';
-                    break;
-                default:
-                    signupError.textContent = 'ERROR: ' + error.message;
-            }
+            signupError.textContent = 'ERROR: ' + error.message;
         }
     }
 
-    // --- 4. Email Login Logic ---
+    // 4. Email Login Handler
     async function handleLogin(e) {
         e.preventDefault();
         const email = document.getElementById('login-username').value;
@@ -118,28 +107,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- UI Switchers ---
-    function showSignupModal() {
+    // Event Listeners
+    loginForm.addEventListener('submit', handleLogin);
+    signupForm.addEventListener('submit', handleSignup);
+    showSignupBtn.addEventListener('click', () => {
         signupModal.classList.remove('hidden');
         loginModal.classList.add('hidden');
         signupForm.reset();
         signupError.textContent = '';
-    }
-
-    function showLoginModal() {
+    });
+    showLoginBtn.addEventListener('click', () => {
         loginModal.classList.remove('hidden');
         signupModal.classList.add('hidden');
         loginForm.reset();
         loginError.textContent = '';
-    }
-
-    // Event Listeners
-    loginForm.addEventListener('submit', handleLogin);
-    signupForm.addEventListener('submit', handleSignup);
-    showSignupBtn.addEventListener('click', showSignupModal);
-    showLoginBtn.addEventListener('click', showLoginModal);
-
-    // Social Listeners
+    });
     googleBtn.addEventListener('click', () => handleSocialLogin(googleProvider));
     githubBtn.addEventListener('click', () => handleSocialLogin(githubProvider));
 });
+
+/* =========================================
+   END OF SECTION: LOGIN / SIGNUP LOGIC
+   ========================================= */
