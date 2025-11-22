@@ -161,6 +161,7 @@ button:disabled {
     border-radius: 0 0 5px 5px;
     gap: 30px;
     box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
 }
 
 .system-apps h3 {
@@ -223,11 +224,15 @@ button:disabled {
 }
 
 .logo-container {
-    flex-grow: 1;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    padding-top: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-top: 10px;
 }
 
 #gdg-logo {
@@ -671,10 +676,17 @@ button:disabled {
         gap: 20px;
         padding: 20px 10px;
         height: auto;
+        position: static;
+    }
+
+    .logo-container {
+        position: static;
+        transform: none;
+        width: 100%;
+        padding-top: 10px;
     }
 
     .system-apps,
-    .logo-container,
     .info-panel {
         width: 100%;
         text-align: center;
