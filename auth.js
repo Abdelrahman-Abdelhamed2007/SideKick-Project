@@ -1,3 +1,34 @@
+// Import Firebase SDKs
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    GoogleAuthProvider, // New
+    GithubAuthProvider, // New
+    signInWithPopup     // New
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDYM_ObQQ1U0nV_upLm1hB9Z0zqu2r4-hE",
+    authDomain: "sidekick-os-a8ebf.firebaseapp.com",
+    projectId: "sidekick-os-a8ebf",
+    storageBucket: "sidekick-os-a8ebf.firebasestorage.app",
+    messagingSenderId: "5370275950",
+    appId: "1:5370275950:web:441e5501e09bd60c509e7f",
+    measurementId: "G-YWNFVYM13Y"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// Create Providers
+const googleProvider = new GoogleAuthProvider();
+const githubProvider = new GithubAuthProvider();
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // DOM Element Caching
@@ -10,103 +41,96 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginError = document.getElementById('login-error');
     const signupError = document.getElementById('signup-error');
 
-    // Check if user is already logged in
-    function checkAuthStatus() {
-        const loggedInUser = localStorage.getItem('currentUser');
-        if (loggedInUser) {
-            // User is already logged in, redirect to home page
-            window.location.href = 'HomePage.html';
+    // New Buttons
+    const googleBtn = document.getElementById('google-login-btn');
+    const githubBtn = document.getElementById('github-login-btn');
+
+    // --- 1. The Gatekeeper ---
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.location.replace('HomePage.html');
+        }
+    });
+
+    // --- 2. Social Login Logic ---
+    async function handleSocialLogin(provider) {
+        try {
+            loginError.style.color = '#00ff41';
+            loginError.textContent = 'CONNECTING...';
+
+            await signInWithPopup(auth, provider);
+            // Redirect happens automatically by onAuthStateChanged
+
+        } catch (error) {
+            console.error(error);
+            loginError.style.color = '#ff0000';
+            loginError.textContent = 'LOGIN FAILED: ' + error.message;
         }
     }
 
+    // --- 3. Email Sign Up Logic ---
+    async function handleSignup(e) {
+        e.preventDefault();
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        const confirmPassword = document.getElementById('signup-confirm-password').value;
+
+        if (password !== confirmPassword) {
+            signupError.textContent = 'PASSWORDS DO NOT MATCH';
+            return;
+        }
+
+        try {
+            signupError.style.color = '#00ff41';
+            signupError.textContent = 'CREATING ACCOUNT...';
+            await createUserWithEmailAndPassword(auth, email, password);
+        } catch (error) {
+            signupError.style.color = '#ff0000';
+            switch (error.code) {
+                case 'auth/email-already-in-use':
+                    signupError.textContent = 'EMAIL ALREADY REGISTERED';
+                    break;
+                case 'auth/weak-password':
+                    signupError.textContent = 'PASSWORD TOO WEAK (6+ CHARS)';
+                    break;
+                case 'auth/invalid-email':
+                    signupError.textContent = 'INVALID EMAIL ADDRESS';
+                    break;
+                default:
+                    signupError.textContent = 'ERROR: ' + error.message;
+            }
+        }
+    }
+
+    // --- 4. Email Login Logic ---
+    async function handleLogin(e) {
+        e.preventDefault();
+        const email = document.getElementById('login-username').value;
+        const password = document.getElementById('login-password').value;
+
+        try {
+            loginError.style.color = '#00ff41';
+            loginError.textContent = 'AUTHENTICATING...';
+            await signInWithEmailAndPassword(auth, email, password);
+        } catch (error) {
+            loginError.style.color = '#ff0000';
+            loginError.textContent = 'INVALID EMAIL OR PASSWORD';
+        }
+    }
+
+    // --- UI Switchers ---
     function showSignupModal() {
         signupModal.classList.remove('hidden');
         loginModal.classList.add('hidden');
+        signupForm.reset();
+        signupError.textContent = '';
     }
 
     function showLoginModal() {
         loginModal.classList.remove('hidden');
         signupModal.classList.add('hidden');
-    }
-
-    function handleLogin(e) {
-        e.preventDefault();
-        const username = document.getElementById('login-username').value;
-        const password = document.getElementById('login-password').value;
-
-        // Get users from localStorage
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const user = users.find(u => u.username === username && u.password === password);
-
-        if (user) {
-            const currentUser = { username: user.username, email: user.email };
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            loginError.textContent = '';
-            loginError.style.color = '#00ff41';
-            loginError.textContent = 'LOGIN SUCCESSFUL! LOADING...';
-            
-            // Redirect to home page after short delay
-            setTimeout(() => {
-                window.location.href = 'HomePage.html';
-            }, 1000);
-        } else {
-            loginError.textContent = 'INVALID USERNAME OR PASSWORD';
-            loginError.style.color = '#ff0000';
-        }
-    }
-
-    function handleSignup(e) {
-        e.preventDefault();
-        const username = document.getElementById('signup-username').value;
-        const email = document.getElementById('signup-email').value;
-        const password = document.getElementById('signup-password').value;
-        const confirmPassword = document.getElementById('signup-confirm-password').value;
-
-        // Validation
-        if (password !== confirmPassword) {
-            signupError.textContent = 'PASSWORDS DO NOT MATCH';
-            signupError.style.color = '#ff0000';
-            return;
-        }
-
-        if (password.length < 6) {
-            signupError.textContent = 'PASSWORD MUST BE AT LEAST 6 CHARACTERS';
-            signupError.style.color = '#ff0000';
-            return;
-        }
-
-        // Get existing users
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        
-        // Check if username already exists
-        if (users.find(u => u.username === username)) {
-            signupError.textContent = 'USERNAME ALREADY EXISTS';
-            signupError.style.color = '#ff0000';
-            return;
-        }
-
-        // Check if email already exists
-        if (users.find(u => u.email === email)) {
-            signupError.textContent = 'EMAIL ALREADY REGISTERED';
-            signupError.style.color = '#ff0000';
-            return;
-        }
-
-        // Create new user
-        const newUser = { username, email, password };
-        users.push(newUser);
-        localStorage.setItem('users', JSON.stringify(users));
-
-        signupError.textContent = '';
-        signupError.style.color = '#00ff41';
-        signupError.textContent = 'ACCOUNT CREATED! REDIRECTING...';
-        
-        setTimeout(() => {
-            signupForm.reset();
-            signupError.style.color = '#ff0000';
-            signupError.textContent = '';
-            showLoginModal();
-        }, 1500);
+        loginForm.reset();
+        loginError.textContent = '';
     }
 
     // Event Listeners
@@ -115,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showSignupBtn.addEventListener('click', showSignupModal);
     showLoginBtn.addEventListener('click', showLoginModal);
 
-    // Check if user is already logged in on page load
-    checkAuthStatus();
-
+    // Social Listeners
+    googleBtn.addEventListener('click', () => handleSocialLogin(googleProvider));
+    githubBtn.addEventListener('click', () => handleSocialLogin(githubProvider));
 });

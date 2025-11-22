@@ -1,41 +1,61 @@
 /* ---
 TABLE OF CONTENTS
-1.  Initialization (DOMContentLoaded)
-    - Authentication Check (Gatekeeper)
-2.  DOM Element Caching
-3.  State Variables
-4.  Core App Logic
+1.  Firebase Setup & Auth (Gatekeeper)
+2.  Initialization (DOMContentLoaded)
+3.  DOM Element Caching
+4.  State Variables
+5.  Core App Logic
     - Logout Functionality
     - Audio (Beep & Unlock)
     - View Switching
     - Launch Sequence
     - Terminal Boot
-5.  Application Logic: TIMER
-6.  Application Logic: TO-DO
-7.  Application Logic: MUSIC
-8.  Application Logic: TRIVIA
-9.  Global Event Listeners
+6.  Application Logic: TIMER
+7.  Application Logic: TO-DO
+8.  Application Logic: MUSIC
+9.  Application Logic: TRIVIA
+10. Global Event Listeners
 --- */
 
-// --- 1. Initialization (DOMContentLoaded) ---
+// --- 1. Firebase Setup & Auth ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// --- PASTE YOUR FIREBASE CONFIG HERE (Must match auth.js) ---
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY_HERE",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// --- 2. Initialization (DOMContentLoaded) ---
 document.addEventListener('DOMContentLoaded', () => {
 
-    // === AUTHENTICATION CHECK (THE GATEKEEPER) ===
-    const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) {
-        // If no user is logged in, kick them back to the login page
-        window.location.href = 'index.html';
-        return; // Stop the rest of the code from running
-    }
+    // === THE GATEKEEPER ===
+    // Check if user is logged in. If not, redirect to login page.
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = 'index.html';
+        } else {
+            // Optional: You could display the user's email in the boot sequence here
+            // console.log("Logged in as:", user.email);
+        }
+    });
 
-    // --- 2. DOM Element Caching ---
+    // --- 3. DOM Element Caching ---
     const terminalOutput = document.getElementById('terminal-output');
     const launchApp = document.getElementById('launch-app');
     const launchText = document.getElementById('launch-text');
     const appButtons = document.querySelectorAll('.app-btn');
     const appViews = document.querySelectorAll('.app-view');
     const monitor = document.querySelector('.monitor');
-    const logoutBtn = document.getElementById('logout-btn'); // New Logout Button
+    const logoutBtn = document.getElementById('logout-btn');
 
     // Timer Elements
     const timerApp = document.getElementById('timer-app');
@@ -80,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const triviaNextBtn = document.getElementById('trivia-next-btn');
     const triviaMessage = document.getElementById('trivia-message');
 
-    // --- 3. State Variables ---
+    // --- 4. State Variables ---
     let timerAppMode = 'COUNTDOWN';
     let permanentBootText = "";
     let audioCtx = null;
@@ -95,15 +115,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let stopwatchLapCounter = 1;
 
 
-    // --- 4. Core App Logic ---
+    // --- 5. Core App Logic ---
 
     // Logout Logic
-    logoutBtn.addEventListener('click', () => {
-        // 1. Clear the session
-        localStorage.removeItem('currentUser');
-        // 2. Redirect to login page
-        window.location.href = 'index.html';
-    });
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error("Logout Failed:", error);
+            });
+        });
+    }
 
     // Audio (Beep & Unlock)
     const createAudioContext = () => {
@@ -191,14 +214,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, totalDuration);
     };
 
-    // Terminal Boot (Modified to show username)
-    // We parse the user object to greet them by name!
-    const userObj = JSON.parse(currentUser);
-    const username = userObj.username ? userObj.username.toUpperCase() : "USER";
-
+    // Terminal Boot
     const bootLines = [
         "SideKick OS v1.0.1",
-        `WELCOME, ${username}`,
+        "WELCOME USER", // You can update this to show user.email if you want
         "SYSTEM READY."
     ];
     const promptLine = "SELECT AN APPLICATION TO BEGIN.";
@@ -235,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
     typeText();
 
 
-    // --- 5. Application Logic: TIMER ---
+    // --- 6. Application Logic: TIMER ---
 
     // Countdown Mode Functions
     function startCountdownTimer() {
@@ -399,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
     timerModeBtn.addEventListener("click", toggleTimerMode);
 
 
-    // --- 6. Application Logic: TO-DO ---
+    // --- 7. Application Logic: TO-DO ---
     const getList = () => {
         const stored = JSON.parse(localStorage.getItem('sidekick-todo-list') || '[]');
         return Array.isArray(stored) ? stored : [];
@@ -483,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // --- 7. Application Logic: MUSIC ---
+    // --- 8. Application Logic: MUSIC ---
     const loadMusicState = () => {
         const state = JSON.parse(localStorage.getItem('sidekick-music-state') || '{}');
         currentTrackIndex = state.trackIndex || 0;
@@ -564,7 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
     musicPlayer.addEventListener('ended', () => !musicPlayer.loop && nextTrack());
     musicProgressContainer.addEventListener('click', setMusicProgress);
 
-    // --- 8. Application Logic: TRIVIA (UPDATED MULTIPLE CHOICE) ---
+    // --- 9. Application Logic: TRIVIA ---
     const getNewQuestion = async () => {
         triviaCategory.textContent = "LOADING...";
         triviaQuestion.textContent = "...";
@@ -639,7 +658,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     triviaNextBtn.addEventListener('click', getNewQuestion);
 
-    // --- 9. Global Event Listeners ---
+    // --- 10. Global Event Listeners ---
     appButtons.forEach(button => {
         button.addEventListener('click', () => {
             const appName = button.getAttribute('data-app');

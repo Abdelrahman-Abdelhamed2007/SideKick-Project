@@ -8,36 +8,48 @@
 
     <link rel="stylesheet" href="auth.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
 
-    <!-- Login Modal -->
     <div id="login-modal" class="auth-modal">
         <div class="auth-modal-content">
             <h2>SIDEKICK OS v1.0.1</h2>
             <h3>LOGIN</h3>
+
             <form id="login-form">
-                <input type="text" id="login-username" placeholder="USERNAME" required>
+                <input type="text" id="login-username" placeholder="EMAIL" required>
                 <input type="password" id="login-password" placeholder="PASSWORD" required>
+
                 <div class="auth-buttons">
                     <button type="submit" class="auth-btn">LOGIN</button>
                     <button type="button" id="show-signup-btn" class="auth-btn">SIGN UP</button>
                 </div>
+
+                <div class="divider">OR</div>
+
+                <div class="social-buttons">
+                    <button type="button" id="google-login-btn" class="social-btn google">
+                        <i class="fab fa-google"></i> GOOGLE
+                    </button>
+                    <button type="button" id="github-login-btn" class="social-btn github">
+                        <i class="fab fa-github"></i> GITHUB
+                    </button>
+                </div>
+
                 <p id="login-error" class="auth-error"></p>
             </form>
         </div>
     </div>
 
-    <!-- Sign Up Modal -->
     <div id="signup-modal" class="auth-modal hidden">
         <div class="auth-modal-content">
             <h2>SIDEKICK OS v1.0.1</h2>
             <h3>SIGN UP</h3>
             <form id="signup-form">
-                <input type="text" id="signup-username" placeholder="USERNAME" required minlength="3">
                 <input type="email" id="signup-email" placeholder="EMAIL" required>
-                <input type="password" id="signup-password" placeholder="PASSWORD" required minlength="6">
+                <input type="password" id="signup-password" placeholder="PASSWORD (6+ CHARS)" required minlength="6">
                 <input type="password" id="signup-confirm-password" placeholder="CONFIRM PASSWORD" required>
                 <div class="auth-buttons">
                     <button type="submit" class="auth-btn">CREATE ACCOUNT</button>
@@ -48,7 +60,7 @@
         </div>
     </div>
 
-    <script src="auth.js"></script>
+    <script type="module" src="auth.js"></script>
 </body>
 
 </html>
