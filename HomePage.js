@@ -8,7 +8,7 @@ TABLE OF CONTENTS
     - View Switching
     - Launch Sequence
     - Terminal Boot
-5.  Application Logic: TIMER (UPDATED with HRS/MIN/SEC)
+5.  Application Logic: TIMER
     - Countdown Mode
     - Stopwatch Mode
     - Timer Controller
@@ -19,7 +19,7 @@ TABLE OF CONTENTS
     - Storage
     - Player Controls
     - Progress Bar
-8.  Application Logic: TRIVIA
+8.  Application Logic: TRIVIA (UPDATED to Multiple Choice)
     - API Fetching
     - Answer Logic
 9.  Global Event Listeners
@@ -39,13 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Timer Elements
     const timerApp = document.getElementById('timer-app');
     const timerDisplayElement = document.getElementById("timer-display-element");
-
-    // New Inputs
     const timerInputsRow = document.getElementById("timer-inputs-row");
     const timerHoursInput = document.getElementById("timer-hours-input");
     const timerMinutesInput = document.getElementById("timer-minutes-input");
     const timerSecondsInput = document.getElementById("timer-seconds-input");
-
     const timerAlarm = document.getElementById("timer-alarm-sound");
     const timerStartBtn = document.getElementById("timer-start-btn");
     const timerPauseBtn = document.getElementById("timer-pause-btn");
@@ -77,8 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const triviaApp = document.getElementById('trivia-app');
     const triviaCategory = document.getElementById('trivia-category');
     const triviaQuestion = document.getElementById('trivia-question');
-    const triviaInput = document.getElementById('trivia-input');
-    const triviaSubmitBtn = document.getElementById('trivia-submit-btn');
+    const triviaChoicesContainer = document.getElementById('trivia-choices-container');
+    const triviaChoiceButtons = document.querySelectorAll('.trivia-choice-btn');
     const triviaNextBtn = document.getElementById('trivia-next-btn');
     const triviaMessage = document.getElementById('trivia-message');
 
@@ -221,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
     typeText();
 
 
-    // --- 5. Application Logic: TIMER (UPDATED) ---
+    // --- 5. Application Logic: TIMER ---
 
     // Countdown Mode Functions
     function startCountdownTimer() {
@@ -551,44 +548,80 @@ document.addEventListener('DOMContentLoaded', () => {
     musicPlayer.addEventListener('ended', () => !musicPlayer.loop && nextTrack());
     musicProgressContainer.addEventListener('click', setMusicProgress);
 
-    // --- 8. Application Logic: TRIVIA ---
+    // --- 8. Application Logic: TRIVIA (UPDATED MULTIPLE CHOICE) ---
     const getNewQuestion = async () => {
         triviaCategory.textContent = "LOADING...";
         triviaQuestion.textContent = "...";
         triviaMessage.textContent = "";
-        triviaInput.value = "";
-        triviaSubmitBtn.disabled = true;
-        currentTriviaAnswer = "";
+        triviaNextBtn.classList.add('hidden');
+
+        // Reset buttons
+        triviaChoiceButtons.forEach(btn => {
+            btn.textContent = "";
+            btn.disabled = true;
+            btn.style.backgroundColor = "var(--screen-text)";
+            btn.style.color = "#000";
+        });
+
         try {
+            // Using The Trivia API
             const response = await fetch('https://the-trivia-api.com/api/questions?limit=1&difficulty=easy');
             const data = await response.json();
+
             if (!data || data.length === 0) throw new Error('No question received');
+
             const questionData = data[0];
             triviaCategory.textContent = `CATEGORY: ${questionData.category.toUpperCase()}`;
             triviaQuestion.textContent = questionData.question;
             currentTriviaAnswer = questionData.correctAnswer;
-            triviaSubmitBtn.disabled = false;
+
+            // Prepare choices
+            const allChoices = [...questionData.incorrectAnswers];
+            // Take only 2 incorrect choices to make 3 total
+            while (allChoices.length > 2) allChoices.pop();
+
+            allChoices.push(currentTriviaAnswer);
+
+            // Shuffle choices
+            allChoices.sort(() => Math.random() - 0.5);
+
+            // Render to buttons
+            triviaChoiceButtons.forEach((btn, index) => {
+                if (allChoices[index]) {
+                    btn.textContent = allChoices[index];
+                    btn.disabled = false;
+                    btn.onclick = () => checkAnswer(btn, allChoices[index]);
+                } else {
+                    btn.textContent = "";
+                    btn.disabled = true;
+                }
+            });
+
         } catch (error) {
+            console.error(error);
             triviaCategory.textContent = "ERROR";
             triviaQuestion.textContent = "Failed to load question. Check connection.";
         }
     };
-    const cleanAnswer = (str) => str ? str.trim().toLowerCase() : "";
-    const checkAnswer = () => {
-        const userAnswer = cleanAnswer(triviaInput.value);
-        const correctAnswer = cleanAnswer(currentTriviaAnswer);
-        if (userAnswer === correctAnswer) {
+
+    const checkAnswer = (btn, selectedAnswer) => {
+        if (selectedAnswer === currentTriviaAnswer) {
             triviaMessage.textContent = "CORRECT!";
             triviaMessage.style.color = 'var(--screen-text)';
+            btn.style.backgroundColor = "var(--screen-text)"; // Keep green
         } else {
-            triviaMessage.textContent = `INCORRECT. Answer: ${currentTriviaAnswer}`;
+            triviaMessage.textContent = `WRONG. Answer: ${currentTriviaAnswer}`;
             triviaMessage.style.color = '#ff4141';
+            btn.style.backgroundColor = "#ff4141"; // Red
+            btn.style.color = "#fff";
         }
-        triviaSubmitBtn.disabled = true;
+
+        // Disable all buttons after answering
+        triviaChoiceButtons.forEach(b => b.disabled = true);
+        triviaNextBtn.classList.remove('hidden');
     };
-    triviaSubmitBtn.addEventListener('click', checkAnswer);
+
     triviaNextBtn.addEventListener('click', getNewQuestion);
-    triviaInput.addEventListener('keypress', (e) => e.key === 'Enter' && checkAnswer());
 
     // --- 9. Global Event Listeners ---
     appButtons.forEach(button => {
@@ -598,4 +631,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-});
+}); // End of DOMContentLoaded

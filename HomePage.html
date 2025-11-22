@@ -87,9 +87,13 @@
                         <div id="trivia-question">...</div>
                     </div>
                     <div class="trivia-answer-wrapper">
-                        <input type="text" id="trivia-input" placeholder="YOUR ANSWER...">
-                        <button id="trivia-submit-btn" class="app-action-btn">SUBMIT</button>
-                        <button id="trivia-next-btn" class="app-action-btn">NEXT</button>
+                        <div id="trivia-choices-container">
+                            <button class="app-action-btn trivia-choice-btn"></button>
+                            <button class="app-action-btn trivia-choice-btn"></button>
+                            <button class="app-action-btn trivia-choice-btn"></button>
+                        </div>
+
+                        <button id="trivia-next-btn" class="app-action-btn">NEXT QUESTION</button>
                         <p id="trivia-message" class="message-line"></p>
                     </div>
                 </div>

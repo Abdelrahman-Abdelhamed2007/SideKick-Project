@@ -1,7 +1,7 @@
 :root {
     --monitor-bg: #111;
     --screen-bg: #000;
-    --screen-text: #00ff41; 
+    --screen-text: #00ff41;
     --dashboard-bg: #40404a;
     --button-bg: #555560;
     --button-hover-bg: #60606b;
@@ -10,7 +10,10 @@
     --light-text: #ccc;
 }
 
-/* --- 2. Global Styles --- */
+/* =========================================
+   1. GLOBAL & DESKTOP STYLES (Default)
+   ========================================= */
+
 body {
     margin: 0;
     padding: 0;
@@ -21,29 +24,36 @@ body {
     background-color: var(--monitor-bg);
     font-family: 'Press Start 2P', 'Consolas', monospace;
     color: var(--button-text);
+    /* Allow scrolling if the window is too short */
+    overflow-y: auto;
 }
 
 .container {
+    /* PC View: Fixed 900px width */
     width: 900px;
+    /* Safety: Ensure it doesn't overflow smaller PC windows */
+    max-width: 95vw;
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
 }
 
-/* --- GLOBAL SCROLLBAR STYLING --- */
+/* Global Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
 }
+
 ::-webkit-scrollbar-track {
     background: #000;
     border-left: 1px solid var(--screen-text);
 }
+
 ::-webkit-scrollbar-thumb {
     background-color: var(--screen-text);
     border-radius: 0;
 }
 
-/* --- UNIFIED BUTTON STYLE --- */
-button.app-action-btn, 
-.timer-buttons button, 
+/* Unified Button Style */
+button.app-action-btn,
+.timer-buttons button,
 #todo-app button,
 .music-buttons button,
 #trivia-app button {
@@ -56,7 +66,7 @@ button.app-action-btn,
     font-size: 0.6rem;
     font-weight: bold;
     text-transform: uppercase;
-    white-space: nowrap;
+    white-space: normal;
     transition: background-color 0.1s, color 0.1s;
 }
 
@@ -84,13 +94,14 @@ button:disabled {
     margin-top: 10px;
 }
 
-/* --- 3. Monitor & Screen Styles --- */
+/* --- Monitor (Top Half) --- */
 .monitor {
     background-color: var(--screen-bg);
     border: 15px solid var(--monitor-bg);
     border-radius: 5px 5px 0 0;
     padding: 20px;
     height: 450px;
+    /* Fixed height for PC */
     overflow: hidden;
     position: relative;
     box-sizing: border-box;
@@ -103,18 +114,17 @@ button:disabled {
     left: 0;
     width: 100%;
     height: 100%;
-    background: repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0.15),
-        rgba(0, 0, 0, 0.15) 1px,
-        transparent 1px,
-        transparent 3px
-    );
+    background: repeating-linear-gradient(0deg,
+            rgba(0, 0, 0, 0.15),
+            rgba(0, 0, 0, 0.15) 1px,
+            transparent 1px,
+            transparent 3px);
     pointer-events: none;
+    z-index: 10;
 }
 
 .screen {
-    position: relative; 
+    position: relative;
     width: 100%;
     height: 100%;
     color: var(--screen-text);
@@ -124,12 +134,13 @@ button:disabled {
     text-shadow: 0 0 5px rgba(0, 255, 65, 0.6);
 }
 
-/* --- 4. Dashboard & Components --- */
+/* --- Dashboard (Bottom Half) --- */
 .dashboard {
     background-color: var(--dashboard-bg);
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
+    /* Side-by-side layout for PC */
     align-items: flex-start;
     border-radius: 0 0 5px 5px;
     gap: 30px;
@@ -217,7 +228,7 @@ button:disabled {
     margin-bottom: 20px;
 }
 
-/* --- 5. APP VIEW GENERAL STYLES --- */
+/* --- App Views --- */
 .app-view {
     position: absolute;
     top: 0;
@@ -235,14 +246,10 @@ button:disabled {
     display: none !important;
 }
 
-/* --- 6. APP: Timer --- */
+/* APP 1: Timer */
 #timer-app {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100%;
+    align-items: center;
 }
 
 .timer-title {
@@ -320,11 +327,10 @@ button:disabled {
     margin: 5px 0;
 }
 
-
-/* --- 7. APP: To-Do List --- */
+/* APP 2: To-Do */
 #todo-app {
     justify-content: flex-start;
-    align-items: center; 
+    align-items: center;
     padding-top: 30px;
 }
 
@@ -419,13 +425,12 @@ button:disabled {
 }
 
 .delete-btn {
-    padding: 5px 10px !important; 
+    padding: 5px 10px !important;
     font-size: 0.5rem !important;
     flex-shrink: 0;
 }
 
-
-/* --- 8. APP: Music Player --- */
+/* APP 3: Music */
 #music-app {
     justify-content: space-between;
     align-items: center;
@@ -499,7 +504,7 @@ button:disabled {
     color: var(--screen-text);
 }
 
-/* --- 9. APP: Trivia --- */
+/* APP 4: Trivia */
 #trivia-app {
     justify-content: space-between;
     align-items: center;
@@ -524,6 +529,7 @@ button:disabled {
 
 #trivia-question {
     font-size: 1rem;
+    line-height: 1.4;
 }
 
 .trivia-answer-wrapper {
@@ -535,25 +541,27 @@ button:disabled {
     width: 100%;
 }
 
-#trivia-input {
-    background: none;
-    border: 1px solid var(--screen-text);
-    color: var(--screen-text);
-    padding: 6px;
-    width: 70%;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.7rem;
-    box-shadow: 0 0 5px rgba(0, 255, 65, 0.4);
+#trivia-choices-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 80%;
     margin-bottom: 15px;
 }
 
-#trivia-submit-btn,
+.trivia-choice-btn {
+    width: 100%;
+    text-align: left;
+    font-size: 0.7rem !important;
+    white-space: normal;
+}
+
 #trivia-next-btn {
     width: 70%;
     margin-bottom: 10px;
 }
 
-/* --- 10. APP: Launch Screen --- */
+/* Launch Screen */
 #launch-app {
     justify-content: center;
     align-items: center;
@@ -563,4 +571,140 @@ button:disabled {
     font-size: 1.2rem;
     text-shadow: 0 0 5px rgba(0, 255, 65, 0.6);
     white-space: pre-wrap;
+}
+
+
+/* =========================================
+   2. MOBILE RESPONSIVE OVERRIDES
+   ========================================= */
+@media (max-width: 768px) {
+
+    body {
+        padding: 20px 10px;
+        /* Less padding on sides */
+        align-items: flex-start;
+        /* Allow scrolling from top */
+        height: auto;
+        /* Allow body to grow */
+    }
+
+    .container {
+        width: 100%;
+        max-width: 100%;
+        box-shadow: none;
+        /* Remove glow to save space */
+    }
+
+    /* MONITOR: Adjust height for mobile */
+    .monitor {
+        height: 50vh;
+        /* Use 50% of screen height */
+        min-height: 300px;
+        max-height: 500px;
+        padding: 10px;
+        /* Less padding inside */
+        border-width: 10px;
+        /* Thinner bezel */
+    }
+
+    /* DASHBOARD: Stack vertically */
+    .dashboard {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        padding: 20px 10px;
+        height: auto;
+    }
+
+    /* Make dashboard sections fill width */
+    .system-apps,
+    .logo-container,
+    .info-panel {
+        width: 100%;
+        text-align: center;
+        align-items: center;
+    }
+
+    .app-buttons {
+        width: 100%;
+        /* Fill width */
+        gap: 10px;
+    }
+
+    .app-btn {
+        justify-content: center;
+        /* Center button text */
+        font-size: 0.7rem;
+        /* Smaller font */
+    }
+
+    .info-panel {
+        align-items: center;
+        /* Center text */
+        padding-top: 0;
+    }
+
+    /* --- APP SPECIFIC ADJUSTMENTS --- */
+
+    /* Timer */
+    #timer-display-element {
+        font-size: 2.5rem;
+        /* Smaller timer font */
+    }
+
+    #timer-inputs-row input {
+        width: 50px;
+        /* Smaller inputs */
+        font-size: 12px;
+    }
+
+    .timer-buttons button {
+        padding: 10px 5px;
+        font-size: 0.5rem;
+    }
+
+    /* To-Do */
+    .input-section {
+        flex-wrap: wrap;
+        /* Allow wrapping on very narrow screens */
+    }
+
+    #todo-input {
+        min-width: 100%;
+        /* Input takes full row */
+    }
+
+    #todo-app button {
+        flex-grow: 1;
+        /* Buttons share row */
+    }
+
+    .todo-item {
+        padding: 5px;
+    }
+
+    .todo-date {
+        display: none;
+        /* Hide date on mobile to save space */
+    }
+
+    /* Music */
+    .music-buttons {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .music-buttons button {
+        padding: 8px 10px;
+        font-size: 0.5rem;
+    }
+
+    /* Trivia */
+    #trivia-question {
+        font-size: 0.8rem;
+    }
+
+    #trivia-choices-container {
+        width: 100%;
+    }
 }
