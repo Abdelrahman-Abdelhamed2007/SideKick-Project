@@ -5,12 +5,12 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     onAuthStateChanged,
-    GoogleAuthProvider, // New
-    GithubAuthProvider, // New
-    signInWithPopup     // New
+    GoogleAuthProvider,
+    GithubAuthProvider,
+    signInWithPopup
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// Firebase Configuration
+// --- YOUR ACTUAL FIREBASE CONFIG ---
 const firebaseConfig = {
     apiKey: "AIzaSyDYM_ObQQ1U0nV_upLm1hB9Z0zqu2r4-hE",
     authDomain: "sidekick-os-a8ebf.firebaseapp.com",

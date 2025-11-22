@@ -21,14 +21,15 @@ TABLE OF CONTENTS
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// --- PASTE YOUR FIREBASE CONFIG HERE (Must match auth.js) ---
+// --- YOUR ACTUAL FIREBASE CONFIG ---
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY_HERE",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyDYM_ObQQ1U0nV_upLm1hB9Z0zqu2r4-hE",
+    authDomain: "sidekick-os-a8ebf.firebaseapp.com",
+    projectId: "sidekick-os-a8ebf",
+    storageBucket: "sidekick-os-a8ebf.firebasestorage.app",
+    messagingSenderId: "5370275950",
+    appId: "1:5370275950:web:441e5501e09bd60c509e7f",
+    measurementId: "G-YWNFVYM13Y"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -42,9 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, (user) => {
         if (!user) {
             window.location.href = 'index.html';
-        } else {
-            // Optional: You could display the user's email in the boot sequence here
-            // console.log("Logged in as:", user.email);
         }
     });
 
@@ -215,9 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Terminal Boot
+    // We can check if a user is already available in the Auth object, but the onAuthStateChanged handles the redirect.
+    // We'll keep the boot generic or you can fetch the user details if you want to personalize the boot screen.
     const bootLines = [
         "SideKick OS v1.0.1",
-        "WELCOME USER", // You can update this to show user.email if you want
         "SYSTEM READY."
     ];
     const promptLine = "SELECT AN APPLICATION TO BEGIN.";
