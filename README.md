@@ -33,7 +33,7 @@ This application was engineered by:
 
 Access the running operating system via the link below:
 
-**🔗 [Launch SideKick OS (GitHub Pages)](https://abdelrahman-abdelhamed2007.github.io/SideKick-OS/HomePage.html)**
+**🔗 [Launch SideKick OS (GitHub Pages)](https://abdelrahman-abdelhamed2007.github.io/SideKick-Project/index.html)**
 
 > **Note:** If you are not logged in, the system will automatically redirect you to the authentication gatekeeper.
 
