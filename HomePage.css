@@ -13,6 +13,12 @@
     --light-text: #ccc;
 }
 
+/* OPTIMIZATION: Custom Text Selection to match Cyberpunk Theme */
+::selection {
+    background: var(--screen-text);
+    color: #000;
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -65,6 +71,7 @@ button.app-action-btn,
     text-transform: uppercase;
     white-space: normal;
     transition: background-color 0.1s, color 0.1s;
+    outline: none;
 }
 
 button.app-action-btn:hover,
@@ -77,11 +84,19 @@ button.app-action-btn:hover,
     color: var(--screen-text);
 }
 
+/* FIX: Removed !important so JS can color validation buttons */
 button:disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
-    background-color: #000 !important;
-    color: var(--screen-text) !important;
+    background-color: #000;
+    color: var(--screen-text);
+    border-color: #444;
+}
+
+/* FIX: Ensure Trivia answers stay readable (100% opacity) when selected */
+.trivia-choice-btn:disabled {
+    opacity: 1;
+    border-color: var(--screen-text);
 }
 
 .app-view {
@@ -107,6 +122,8 @@ button:disabled {
     text-align: center;
     height: 1em;
     margin-top: 10px;
+    /* Ensure message has space to show */
+    min-height: 20px;
 }
 
 /* =========================================
@@ -128,6 +145,7 @@ button:disabled {
     box-sizing: border-box;
 }
 
+/* CRT Scanline Effect */
 .monitor::before {
     content: '';
     position: absolute;
@@ -245,7 +263,6 @@ button:disabled {
     height: 50%;
     filter: grayscale(100%) brightness(150%);
     opacity: 1;
-
 }
 
 .info-panel {
@@ -325,6 +342,12 @@ button:disabled {
     padding: 10px;
     text-align: center;
     font-size: 14px;
+    outline: none;
+}
+
+/* OPTIMIZATION: Better focus state for inputs */
+#timer-inputs-row input:focus {
+    background-color: #002200;
 }
 
 .timer-buttons {
@@ -487,6 +510,11 @@ button:disabled {
     font-family: 'Press Start 2P', monospace;
     font-size: 0.7rem;
     box-shadow: 0 0 5px rgba(0, 255, 65, 0.4);
+    outline: none;
+}
+
+#todo-input:focus {
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.7);
 }
 
 #todo-list {
@@ -685,8 +713,6 @@ button:disabled {
         max-width: 200px;
     }
 
-    /* Smaller logo on mobile */
-
     .system-apps,
     .info-panel {
         width: 100%;
@@ -766,7 +792,3 @@ button:disabled {
         width: 100%;
     }
 }
-
-/* =========================================
-   END OF SECTION: MOBILE RESPONSIVE
-   ========================================= */

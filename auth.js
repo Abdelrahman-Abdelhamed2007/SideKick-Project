@@ -61,6 +61,13 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
+// Helper: Toggle Button State
+const toggleButtonState = (btn, isLoading, loadingText, originalText) => {
+    if (!btn) return;
+    btn.disabled = isLoading;
+    btn.textContent = isLoading ? loadingText : originalText;
+};
+
 // 2. Social Login Handler
 async function handleSocialLogin(provider) {
     try {
@@ -77,6 +84,9 @@ async function handleSocialLogin(provider) {
 // 3. Email Sign Up Handler
 async function handleSignup(e) {
     e.preventDefault();
+    const submitBtn = signupForm.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.textContent;
+
     const email = document.getElementById('signup-email').value;
     const password = document.getElementById('signup-password').value;
     const confirmPassword = document.getElementById('signup-confirm-password').value;
@@ -87,35 +97,49 @@ async function handleSignup(e) {
     }
 
     try {
+        // OPTIMIZATION: Disable button to prevent double-submit
+        toggleButtonState(submitBtn, true, "CREATING...", originalBtnText);
         signupError.style.color = '#00ff41';
         signupError.textContent = 'CREATING ACCOUNT...';
+
         await createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
         signupError.style.color = '#ff0000';
-        // Error handling map
         const errorMap = {
             'auth/email-already-in-use': 'EMAIL ALREADY REGISTERED',
             'auth/weak-password': 'PASSWORD TOO WEAK (6+ CHARS)',
             'auth/invalid-email': 'INVALID EMAIL ADDRESS'
         };
         signupError.textContent = errorMap[error.code] || ('ERROR: ' + error.message);
+
+        // OPTIMIZATION: Re-enable button on error
+        toggleButtonState(submitBtn, false, "", originalBtnText);
     }
 }
 
 // 4. Email Login Handler
 async function handleLogin(e) {
     e.preventDefault();
+    const submitBtn = loginForm.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.textContent;
+
     const email = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
 
     try {
+        // OPTIMIZATION: Disable button to prevent double-submit
+        toggleButtonState(submitBtn, true, "VERIFYING...", originalBtnText);
         loginError.style.color = '#00ff41';
         loginError.textContent = 'AUTHENTICATING...';
+
         await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
-        console.error(error); // Helpful for debugging
+        console.error(error);
         loginError.style.color = '#ff0000';
         loginError.textContent = 'INVALID EMAIL OR PASSWORD';
+
+        // OPTIMIZATION: Re-enable button on error
+        toggleButtonState(submitBtn, false, "", originalBtnText);
     }
 }
 
@@ -129,6 +153,8 @@ if (showSignupBtn) {
         loginModal.classList.add('hidden');
         signupForm.reset();
         signupError.textContent = '';
+        // OPTIMIZATION: Auto-focus the email field
+        document.getElementById('signup-email').focus();
     });
 }
 
@@ -138,6 +164,8 @@ if (showLoginBtn) {
         signupModal.classList.add('hidden');
         loginForm.reset();
         loginError.textContent = '';
+        // OPTIMIZATION: Auto-focus the email field
+        document.getElementById('login-username').focus();
     });
 }
 

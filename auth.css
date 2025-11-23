@@ -6,6 +6,12 @@
     --monitor-bg: #111;
 }
 
+/* OPTIMIZATION: Consistent Cyberpunk Text Selection */
+::selection {
+    background: var(--screen-text);
+    color: #000;
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -93,10 +99,13 @@ body {
     font-family: 'Press Start 2P', monospace;
     font-size: 0.7rem;
     outline: none;
+    transition: box-shadow 0.2s, background-color 0.2s;
 }
 
+/* OPTIMIZATION: Better focus feedback */
 .auth-modal-content input:focus {
-    box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.6);
+    background-color: #001100;
 }
 
 .auth-buttons {
@@ -118,12 +127,23 @@ body {
     text-transform: uppercase;
     transition: all 0.2s;
     flex: 1;
+    outline: none;
 }
 
 .auth-btn:hover {
     background-color: #000;
     color: var(--screen-text);
     box-shadow: 0 0 15px rgba(0, 255, 65, 0.6);
+}
+
+/* OPTIMIZATION: Disabled state for buttons */
+.auth-btn:disabled,
+.social-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #000 !important;
+    color: var(--screen-text) !important;
+    box-shadow: none !important;
 }
 
 .auth-error {
@@ -180,6 +200,7 @@ body {
     gap: 8px;
     transition: all 0.2s;
     text-transform: uppercase;
+    outline: none;
 }
 
 .social-btn.google {

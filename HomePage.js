@@ -21,7 +21,7 @@ TABLE OF CONTENTS
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
-    getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc
+    getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // --- YOUR ACTUAL FIREBASE CONFIG ---
@@ -50,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'index.html';
         } else {
             currentUser = user;
-            // Initialize Cloud Listeners once we have a user
             initTodoListener(user);
         }
     });
@@ -117,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Timer State Variables
     let countdownTimerInterval, stopwatchInterval;
-    let countdownTimeLeft, stopwatchElapsed = 0;
+    let countdownTimeLeft, stopwatchElapsed = 0, stopwatchStartTime;
     let isCountdownPaused = false, isStopwatchRunning = false;
     let stopwatchLapCounter = 1;
 
@@ -162,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const switchView = (appName) => {
         terminalOutput.classList.add('hidden');
         appViews.forEach(view => view.classList.add('hidden'));
+
         if (appName === 'timer') {
             timerApp.classList.remove('hidden');
             timerAppMode = 'COUNTDOWN';
@@ -169,10 +169,9 @@ document.addEventListener('DOMContentLoaded', () => {
             resetCountdownTimer();
         } else if (appName === 'todo') {
             todoApp.classList.remove('hidden');
-            // List auto-updates via Listener
         } else if (appName === 'music') {
             musicApp.classList.remove('hidden');
-            loadMusicState(); // Local state
+            loadMusicState();
         } else if (appName === 'trivia') {
             triviaApp.classList.remove('hidden');
             getNewQuestion();
@@ -215,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let lineIndex = 0;
     const typingSpeed = 50;
     const lineDelay = 500;
+
     function typeText() {
         if (lineIndex < bootLines.length) {
             const currentLine = bootLines[lineIndex];
@@ -229,14 +229,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 charIndex = 0;
                 setTimeout(typeText, lineDelay);
             }
-        } else if (lineIndex === bootLines.length) {
+        }
+        else if (lineIndex === bootLines.length) {
             if (charIndex < promptLine.length) {
                 let typingPrompt = promptLine.substring(0, charIndex + 1);
-                terminalOutput.innerHTML = permanentBootText + typingPrompt + '_';
+                terminalOutput.innerHTML = permanentBootText + '<br>' + typingPrompt + '_';
                 charIndex++;
                 setTimeout(typeText, typingSpeed);
             } else {
-                terminalOutput.innerHTML = permanentBootText + promptLine + '_';
+                terminalOutput.innerHTML = permanentBootText + '<br>' + promptLine + '_';
                 lineIndex++;
             }
         }
@@ -247,6 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 6. Application Logic: TIMER ---
     function startCountdownTimer() {
         unlockAudio();
+        timerAlarm.volume = 1.0;
         timerAlarm.play().catch(e => console.log("Audio blocked"));
         timerAlarm.pause();
 
@@ -328,6 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let milliseconds = Math.floor((stopwatchElapsed % 1000) / 10);
         let minutes = Math.floor(totalSeconds / 60);
         let seconds = totalSeconds % 60;
+
         timerDisplayElement.textContent =
             `${String(minutes).padStart(2, "0")}:` +
             `${String(seconds).padStart(2, "0")}.` +
@@ -386,8 +389,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- 7. Application Logic: TO-DO (CLOUD SYNC) ---
-
-    // Initialize Real-time Listener
     function initTodoListener(user) {
         const todosRef = collection(db, "users", user.uid, "todos");
         const q = query(todosRef, orderBy("createdAt", "asc"));
@@ -401,7 +402,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Render Cloud List
     const renderCloudList = (list) => {
         todoListElement.innerHTML = '';
         if (list.length === 0) {
@@ -448,7 +448,6 @@ document.addEventListener('DOMContentLoaded', () => {
         todoListElement.appendChild(fragment);
     };
 
-    // Add to Cloud
     const addItem = async () => {
         if (!currentUser) return;
         const text = todoInput.value.trim();
@@ -481,10 +480,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const deleteAllItems = async () => {
         if (!currentUser) return;
-        if (confirm("DELETE ALL tasks? (Only local UI cleared in this simplified version)")) {
-            // Batch delete is complex in vanilla JS without Admin SDK. 
-            // For this project, we will alert the user.
-            alert("To ensure data safety, please delete tasks individually.");
+        const originalText = deleteAllBtn.textContent;
+        deleteAllBtn.textContent = "...";
+        deleteAllBtn.disabled = true;
+
+        try {
+            const todosRef = collection(db, "users", currentUser.uid, "todos");
+            const snapshot = await getDocs(todosRef);
+            const deletePromises = snapshot.docs.map(document =>
+                deleteDoc(doc(db, "users", currentUser.uid, "todos", document.id))
+            );
+            await Promise.all(deletePromises);
+        } catch (error) {
+            console.error("Error clearing list:", error);
+            alert("Error clearing tasks.");
+        } finally {
+            deleteAllBtn.textContent = originalText;
+            deleteAllBtn.disabled = false;
         }
     };
 
@@ -496,7 +508,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- 8. Application Logic: MUSIC (LOCAL) ---
-    // Using Local File API (Free & Reliable)
     const loadMusicState = () => {
         const state = JSON.parse(localStorage.getItem('sidekick-music-state') || '{}');
         currentTrackIndex = state.trackIndex || 0;
@@ -586,16 +597,16 @@ document.addEventListener('DOMContentLoaded', () => {
         triviaMessage.textContent = "";
         triviaNextBtn.classList.add('hidden');
 
-        // Reset buttons
         triviaChoiceButtons.forEach(btn => {
             btn.textContent = "";
             btn.disabled = true;
+            // Reset to default Green state
             btn.style.backgroundColor = "var(--screen-text)";
             btn.style.color = "#000";
+            btn.style.borderColor = "var(--screen-text)";
         });
 
         try {
-            // Using The Trivia API
             const response = await fetch('https://the-trivia-api.com/api/questions?limit=1&difficulty=easy');
             const data = await response.json();
 
@@ -606,17 +617,11 @@ document.addEventListener('DOMContentLoaded', () => {
             triviaQuestion.textContent = questionData.question;
             currentTriviaAnswer = questionData.correctAnswer;
 
-            // Prepare choices
             const allChoices = [...questionData.incorrectAnswers];
-            // Take only 2 incorrect choices to make 3 total
             while (allChoices.length > 2) allChoices.pop();
-
             allChoices.push(currentTriviaAnswer);
-
-            // Shuffle choices
             allChoices.sort(() => Math.random() - 0.5);
 
-            // Render to buttons
             triviaChoiceButtons.forEach((btn, index) => {
                 if (allChoices[index]) {
                     btn.textContent = allChoices[index];
@@ -631,24 +636,39 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error(error);
             triviaCategory.textContent = "ERROR";
-            triviaQuestion.textContent = "Failed to load question. Check connection.";
+            triviaQuestion.textContent = "Failed to load question.";
         }
     };
 
     const checkAnswer = (btn, selectedAnswer) => {
+        // OPTIMIZATION: Loop through all buttons to reveal the correct answer
+        triviaChoiceButtons.forEach(b => {
+            b.disabled = true; // Lock everything
+
+            if (b.textContent === currentTriviaAnswer) {
+                // ALWAYS highlight the correct answer in Green
+                b.style.backgroundColor = "var(--screen-text)";
+                b.style.color = "#000";
+            } else if (b === btn && selectedAnswer !== currentTriviaAnswer) {
+                // If this is the button the user clicked, and it was WRONG, turn Red
+                b.style.backgroundColor = "#ff4141";
+                b.style.color = "#fff";
+            } else {
+                // Non-selected, wrong answers: Dim them (Turn black)
+                b.style.backgroundColor = "#000";
+                b.style.color = "#888"; // Dim text
+                b.style.borderColor = "#444";
+            }
+        });
+
         if (selectedAnswer === currentTriviaAnswer) {
             triviaMessage.textContent = "CORRECT!";
             triviaMessage.style.color = 'var(--screen-text)';
-            btn.style.backgroundColor = "var(--screen-text)"; // Keep green
         } else {
-            triviaMessage.textContent = `WRONG. Answer: ${currentTriviaAnswer}`;
+            triviaMessage.textContent = "WRONG!";
             triviaMessage.style.color = '#ff4141';
-            btn.style.backgroundColor = "#ff4141"; // Red
-            btn.style.color = "#fff";
         }
 
-        // Disable all buttons after answering
-        triviaChoiceButtons.forEach(b => b.disabled = true);
         triviaNextBtn.classList.remove('hidden');
     };
 
@@ -658,7 +678,7 @@ document.addEventListener('DOMContentLoaded', () => {
     appButtons.forEach(button => {
         button.addEventListener('click', () => {
             const appName = button.getAttribute('data-app');
-            launchAppSequence(appName);
+            if (appName) launchAppSequence(appName);
         });
     });
 
