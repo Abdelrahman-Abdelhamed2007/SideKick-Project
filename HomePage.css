@@ -197,6 +197,10 @@ button:disabled {
     color: var(--button-text);
 }
 
+#outer-logout-btn {
+    padding-top: 50px;
+}
+
 #logout-btn {
     grid-column: 1 / -1;
     background-color: #ff4141;
@@ -237,10 +241,8 @@ button:disabled {
 }
 
 #gdg-logo {
-    width: 100%;
-    max-width: 250px;
-    padding-left: 150px;
-    height: 100px;
+    width: 50%;
+    height: 50%;
     filter: grayscale(100%) brightness(150%);
     opacity: 1;
 
