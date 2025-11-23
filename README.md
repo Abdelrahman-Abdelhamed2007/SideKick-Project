@@ -1,7 +1,3 @@
-Here is the final, updated `README.md`. I have expanded the contributor roles using professional titles that fit the project's engineering theme.
-
------
-
 # 💾 SideKick OS v1.0.1
 
 **A retro-futuristic virtual operating system simulating a 1980s Cyberpunk terminal.**
